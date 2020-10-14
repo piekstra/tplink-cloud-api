@@ -48,9 +48,13 @@ class TPLinkDevice:
         return sub_request_response
 
     def power_on(self):
+        if self.child_id:
+            return self._pass_through_request('system', 'set_relay_state', { 'state': 1 })
         return self._pass_through_request('system', 'set_relay_state', 1)
 
     def power_off(self):
+        if self.child_id:
+            return self._pass_through_request('system', 'set_relay_state', { 'state': 0 })
         return self._pass_through_request('system', 'set_relay_state', 0)
 
     def toggle(self):
