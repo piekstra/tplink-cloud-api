@@ -2,8 +2,9 @@ from .device_info import TPLinkDeviceInfo
 from .device_client import TPLinkDeviceClient
 from .client import TPLinkApi
 
-# Supported / Used devices
+# Supported devices
 from .hs300 import HS300
+from .hs100 import HS100
 from .device import TPLinkDevice
 
 class TPLinkDeviceManager:
@@ -49,6 +50,8 @@ class TPLinkDeviceManager:
             verbose=self._verbose
         )
         if tplink_device_info.device_model.startswith('HS300'):
+            return HS100(client, tplink_device_info.device_id, tplink_device_info)
+        elif tplink_device_info.device_model.startswith('HS100'):
             return HS300(client, tplink_device_info.device_id, tplink_device_info)
         else:
             return TPLinkDevice(client, tplink_device_info.device_id, tplink_device_info)
