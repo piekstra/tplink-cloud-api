@@ -1,5 +1,4 @@
 from .device_type import TPLinkDeviceType
-from .device_child_info import TPLinkDeviceChildInfo
 
 import json
 
@@ -63,8 +62,13 @@ class TPLinkDevice:
         else:
             self.power_on()
 
-    def get_sys_info(self):
+    def _get_sys_info(self):
         return self._pass_through_request('system', 'get_sysinfo', None)
+
+    # This is intended to be overriden by actual device 
+    # implementations where sys info is well-defined
+    def get_sys_info(self):
+        return self._get_sys_info()
 
     def is_on(self):
         sys_info = self.get_sys_info()
