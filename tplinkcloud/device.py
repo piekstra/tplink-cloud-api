@@ -28,11 +28,12 @@ class TPLinkDevice:
         request_data = {
             request_type: {
                 sub_request_type: request
-            },
-            'context': {
-                'child_ids': [self.child_id] if self.child_id else None
             }
         }
+        if self.child_id:
+            request_data['context'] = {
+                'child_ids': [self.child_id] if self.child_id else None
+            }
         response = self.client.pass_through_request(self.device_id, request_data)
         if not response:
             return None
@@ -47,14 +48,10 @@ class TPLinkDevice:
         return sub_request_response
 
     def power_on(self):
-        if self.child_id:
-            return self._pass_through_request('system', 'set_relay_state', { 'state': 1 })
-        return self._pass_through_request('system', 'set_relay_state', 1)
+        return self._pass_through_request('system', 'set_relay_state', { 'state': 1 })
 
     def power_off(self):
-        if self.child_id:
-            return self._pass_through_request('system', 'set_relay_state', { 'state': 0 })
-        return self._pass_through_request('system', 'set_relay_state', 0)
+        return self._pass_through_request('system', 'set_relay_state', { 'state': 0 })
 
     def toggle(self):
         if self.is_on():
@@ -71,14 +68,16 @@ class TPLinkDevice:
         return self._get_sys_info()
 
     def is_on(self):
-        sys_info = self.get_sys_info()
+        device_sys_info = self.get_sys_info()
+        sys_info = device_sys_info.__dict__ if hasattr(device_sys_info, '__dict__') else device_sys_info
         if self.child_id:
             return sys_info['state'] == 1
 
         return sys_info['relay_state'] == 1
 
     def is_off(self):
-        sys_info = self.get_sys_info()
+        device_sys_info = self.get_sys_info()
+        sys_info = device_sys_info.__dict__ if hasattr(device_sys_info, '__dict__') else device_sys_info
         if self.child_id:
             return sys_info['state'] == 0
 
