@@ -6,7 +6,7 @@ https://github.com/adumont/tplink-cloud-api
 
 # Introduction
 
-The `tplinkcloud` Python module allows you to remotely control your TP-Link smartplugs (HS100, HS103, HS105, HS110, HS300), smart switches (HS200), and smartbulbs (LB100, LB110, LB120, LB130, KL60, KL110, KL120, KL130, and more) using the TP-Link cloud web service, from anywhere, without the need to be on the same wifi/lan.
+The `tplinkcloud` Python module allows you to remotely control your TP-Link smartplugs (HS100, HS103, HS105, HS110, HS300) using the TP-Link cloud web service, from anywhere, without the need to be on the same wifi/lan.
 
 It's especially useful in scenarios where you want to control your devices from public web services, like [IFTTT](https://ifttt.com/), [Thinger.io](https://thinger.io/), [Webtask.io](https://webtask.io/), [Glitch.com](http://glitch.com/), Tasker (Android)...
 
@@ -14,6 +14,10 @@ It's especially useful in scenarios where you want to control your devices from 
 
 The following devices are _officially_ supported by the library at this time:
 * HS300 (Smart Plug Power Strip with 6 Smart Outlets)
+* HS100 (Older Smart Plug - Blocks two outlets as a single outlet)
+* HS103 (Smaller Single-Socket Smart Plug - 12 Amp)
+* HS105 (Smaller Single-Socket Smart Plug - 15 Amp)
+* HS110 (Older Smart Plug - Blocks two outlets as a single outlet)
 
 # Installation
 
@@ -85,7 +89,7 @@ To retrieve power consumption data for one of the individual plugs on the power 
 ```python
 import json
 power_usage = device_manager.find_device("My Smart Plug").get_power_usage()
-print(json.dumps(power_usage, indent=2))
+print(json.dumps(power_usage, indent=2, default=lambda x: x.__dict__))
 ```
 
 If you want to get multiple devices with a name including a certain substring, you can use the following:
@@ -99,14 +103,6 @@ if devices:
     print(f'{device.model_type.name} device called {device.get_alias()}')
 ```
 
-### Smart Plugs (Not Power Strips) (HS100)
+### Smart Plugs (Not Power Strips) (HS100, HS103, HS105, HS110)
 
-Not yet supported officially by this library
-
-### Smart Switches (HS200)
-
-Not yet supported officially by this library
-
-### Smartbulbs (LB100/110/120/130, KL110/120/130)
-
-Not yet supported officially by this library
+These have the same functionality as the Smart Power Strips, though the HS103 and HS105 do not have the power usage features.
