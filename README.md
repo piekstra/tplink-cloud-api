@@ -1,6 +1,9 @@
 # tplink-cloud-api
 A Python library for to remotely control TP-Link smart home devices using their cloud service - no need to be on the same network as your devices
 
+This is a Python port of Adumont's Node.js module:
+https://github.com/adumont/tplink-cloud-api
+
 # Introduction
 
 The `tplinkcloud` Python module allows you to remotely control your TP-Link smartplugs (HS100, HS103, HS105, HS110, HS300), smart switches (HS200), and smartbulbs (LB100, LB110, LB120, LB130, KL60, KL110, KL120, KL130, and more) using the TP-Link cloud web service, from anywhere, without the need to be on the same wifi/lan.
@@ -14,7 +17,12 @@ The following devices are _officially_ supported by the library at this time:
 
 # Installation
 
-Clone the repo and cd into the directory:
+The package is availble via PyPi and can be installed with the following command:
+```
+pip3 install tplink-cloud-api
+```
+
+To install it from the repo, clone the repo and cd into the directory:
 
 ```
 git clone https://github.com/piekstra/tplink-cloud-api.git
@@ -26,8 +34,6 @@ You can install this library with `pip`:
 ```
 pip3 install .
 ```
-
-I plan to provide this library via PyPi in the future.
 
 # Usage
 
