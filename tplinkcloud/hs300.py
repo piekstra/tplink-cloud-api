@@ -34,9 +34,10 @@ class HS300(TPLinkEMeterDevice):
     def get_children(self):
         sys_info = self.get_sys_info()
         children = []
-        for child_info in sys_info.children:
-            device_child = HS300Child(self.client, sys_info.device_id, child_info.id, child_info)
-            children.append(device_child)
+        if sys_info:
+            for child_info in sys_info.children:
+                device_child = HS300Child(self.client, sys_info.device_id, child_info.id, child_info)
+                children.append(device_child)
         return children
 
     # An override of an identified TPLinkDevice
@@ -45,4 +46,6 @@ class HS300(TPLinkEMeterDevice):
 
     def get_sys_info(self):
         sys_info = self._get_sys_info()
-        return HS300SysInfo(sys_info)
+        if sys_info:
+            return HS300SysInfo(sys_info)
+        return None
