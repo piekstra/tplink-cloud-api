@@ -46,7 +46,7 @@ pip3 install .
 Instantiating a TP Link Device Manager automatically logs in with your TP-Link credentials, caches the login token, and fetches your devices. The current TP-Link Cloud API Url (https://wap.tplinkcloud.com) is assumed if not provided explicitly.
 
 ```python
-from tplink_cloud_api import TPLinkDeviceManager
+from tplinkcloud import TPLinkDeviceManager
 
 username='kasa@email.com'
 password='secure'
