@@ -1,5 +1,5 @@
 # tplink-cloud-api
-A Python library for to remotely control TP-Link smart home devices using their cloud service - no need to be on the same network as your devices
+A Python library to remotely control TP-Link smart home devices using their cloud service - no need to be on the same network as your devices
 
 This is a Python port of Adumont's Node.js module:
 https://github.com/adumont/tplink-cloud-api
