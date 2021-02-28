@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-__version__ = '1.1.0'
+__version__ = '1.2.0'
 
 with open('README.md', 'r', encoding='utf-8') as readme:
     long_description = readme.read()
@@ -18,7 +18,7 @@ setup(
     long_description_content_type='text/markdown',
     install_requires=[
         'requests', 
-        'pyyaml'
+        'asyncio'
     ],
     url='https://github.com/piekstra/tplink-cloud-api',
     python_requires='>=3.6',

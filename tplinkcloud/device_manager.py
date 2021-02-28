@@ -1,3 +1,5 @@
+import asyncio
+
 from .device_info import TPLinkDeviceInfo
 from .device_client import TPLinkDeviceClient
 from .client import TPLinkApi
@@ -23,20 +25,24 @@ class TPLinkDeviceManager:
         self._auth_token = self._tplink_api.login(username, password)
         # Fetch the devices up front if prefetch and cache them if caching
         if prefetch and self._cache_devices:
-            self._fetch_devices()
+            asyncio.run(self._fetch_devices())
 
-    def _fetch_devices(self):
+    async def _fetch_devices(self):
         if self._cached_devices:
             return self._cached_devices
 
         device_info_list = self._tplink_api.get_device_info_list(self._auth_token)
-        devices = []
-        for device_info in device_info_list:
-            device = self._construct_device(device_info)
-            devices.append(device)            
-            if device.has_children():
-                # We expect these to be "constructed" devices
-                devices.extend(device.get_children())
+    
+        devices = await asyncio.gather(
+            *[self._construct_device(device_info) for device_info in device_info_list]
+        )
+
+        child_devices = await asyncio.gather(
+            *[device.get_children() for device in devices if device.has_children()]
+        )
+
+        for child_groups in child_devices:
+            devices.extend(child_groups)
 
         if self._cache_devices:
             self._device_info_list = device_info_list
@@ -44,7 +50,7 @@ class TPLinkDeviceManager:
         
         return devices
 
-    def _construct_device(self, device_info):
+    async def _construct_device(self, device_info):
         # Construct the TPLinkDeviceInfo here for convenience
         tplink_device_info = TPLinkDeviceInfo(device_info)
         # In case the app_server_url is different, we construct a client each time
@@ -61,6 +67,8 @@ class TPLinkDeviceManager:
             return HS105(client, tplink_device_info.device_id, tplink_device_info)
         elif tplink_device_info.device_model.startswith('HS110'):
             return HS110(client, tplink_device_info.device_id, tplink_device_info)
+        elif tplink_device_info.device_model.startswith('KP115'):
+            return KP115(client, tplink_device_info.device_id, tplink_device_info)
         elif tplink_device_info.device_model.startswith('HS300'):
             return HS300(client, tplink_device_info.device_id, tplink_device_info)
         elif tplink_device_info.device_model.startswith('KP115'):
@@ -69,10 +77,10 @@ class TPLinkDeviceManager:
             return TPLinkDevice(client, tplink_device_info.device_id, tplink_device_info)
 
     def get_devices(self):
-        return self._fetch_devices()
+        return asyncio.run(self._fetch_devices())
 
     def find_device(self, device_name):
-        devices = self._fetch_devices()
+        devices = self.get_devices()
         # Just return the first match
         for device in devices:
             if device.get_alias() == device_name:
@@ -81,7 +89,7 @@ class TPLinkDeviceManager:
         return None
     
     def find_devices(self, device_names_like):
-        devices = self._fetch_devices()
+        devices = self.get_devices()
         matching_devices = []
         for device in devices:
             if device_names_like.lower() in device.get_alias().lower():
