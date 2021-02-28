@@ -6,7 +6,7 @@ https://github.com/adumont/tplink-cloud-api
 
 # Introduction
 
-The `tplinkcloud` Python module allows you to remotely control your TP-Link smartplugs (HS100, HS103, HS105, HS110, HS300) using the TP-Link cloud web service, from anywhere, without the need to be on the same wifi/lan.
+The `tplinkcloud` Python module allows you to remotely control your TP-Link smartplugs (HS100, HS103, HS105, HS110, HS300, KP115) using the TP-Link cloud web service, from anywhere, without the need to be on the same wifi/lan.
 
 It's especially useful in scenarios where you want to control your devices from public web services, like [IFTTT](https://ifttt.com/), [Thinger.io](https://thinger.io/), [Webtask.io](https://webtask.io/), [Glitch.com](http://glitch.com/), Tasker (Android)...
 
@@ -18,6 +18,7 @@ The following devices are _officially_ supported by the library at this time:
 * HS103 (Smaller Single-Socket Smart Plug - 12 Amp)
 * HS105 (Smaller Single-Socket Smart Plug - 15 Amp)
 * HS110 (Older Smart Plug - Blocks two outlets as a single outlet)
+* KP115 (Small Single-Socket Smart Plug - 15 Amp; replacement for HS110)
 
 # Installation
 
@@ -103,6 +104,6 @@ if devices:
     print(f'{device.model_type.name} device called {device.get_alias()}')
 ```
 
-### Smart Plugs (Not Power Strips) (HS100, HS103, HS105, HS110)
+### Smart Plugs (Not Power Strips) (HS100, HS103, HS105, HS110, KP115)
 
 These have the same functionality as the Smart Power Strips, though the HS103 and HS105 do not have the power usage features.
