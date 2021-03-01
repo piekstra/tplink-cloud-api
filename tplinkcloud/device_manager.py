@@ -67,8 +67,6 @@ class TPLinkDeviceManager:
             return HS105(client, tplink_device_info.device_id, tplink_device_info)
         elif tplink_device_info.device_model.startswith('HS110'):
             return HS110(client, tplink_device_info.device_id, tplink_device_info)
-        elif tplink_device_info.device_model.startswith('KP115'):
-            return KP115(client, tplink_device_info.device_id, tplink_device_info)
         elif tplink_device_info.device_model.startswith('HS300'):
             return HS300(client, tplink_device_info.device_id, tplink_device_info)
         elif tplink_device_info.device_model.startswith('KP115'):
