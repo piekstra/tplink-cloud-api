@@ -3,6 +3,7 @@ services:
 
     mock-tplink-api:
       image: rodolpheche/wiremock
+      restart: always
       ports:
         # HTTP
         - "8080:8080" 
