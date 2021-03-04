@@ -34,7 +34,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Start docker containers for tests
       run: |
-        docker-compose up -d
+        docker-compose up -d mock-tplink-api
     - name: Test with pytest
       env:
         TPLINK_KASA_USERNAME: kasa_docker

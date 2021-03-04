@@ -42,7 +42,7 @@ class TestFindDevice(object):
         assert device.device_info.device_type == 'IOT.SMARTPLUGSWITCH'
         assert device.device_info.role == 0
         assert device.device_info.fw_ver == '1.1.3 Build 200804 Rel.095135'
-        assert device.device_info.app_server_url == 'http://localhost:8080'
+        assert device.device_info.app_server_url == 'http://127.0.0.1:8080'
         assert device.device_info.device_region == 'us-east-1'
         assert device.device_info.device_id == device_id
         assert device.device_info.device_name == 'Smart Wi-Fi Plug Lite'
@@ -72,7 +72,7 @@ class TestFindDevice(object):
         assert device.device_info.device_type == 'IOT.SMARTPLUGSWITCH'
         assert device.device_info.role == 0
         assert device.device_info.fw_ver == '1.5.6 Build 191114 Rel.104204'
-        assert device.device_info.app_server_url == 'http://localhost:8080'
+        assert device.device_info.app_server_url == 'http://127.0.0.1:8080'
         assert device.device_info.device_region == 'us-east-1'
         assert device.device_info.device_id == device_id
         assert device.device_info.device_name == 'Smart Wi-Fi Plug Mini'
@@ -102,7 +102,7 @@ class TestFindDevice(object):
         assert device.device_info.device_type == 'IOT.SMARTPLUGSWITCH'
         assert device.device_info.role == 0
         assert device.device_info.fw_ver == '1.2.6 Build 200727 Rel.121701'
-        assert device.device_info.app_server_url == 'http://localhost:8080'
+        assert device.device_info.app_server_url == 'http://127.0.0.1:8080'
         assert device.device_info.device_region == 'us-east-1'
         assert device.device_info.device_id == device_id
         assert device.device_info.device_name == 'Wi-Fi Smart Plug With Energy Monitoring'
@@ -132,7 +132,7 @@ class TestFindDevice(object):
         assert device.device_info.device_type == 'IOT.SMARTPLUGSWITCH'
         assert device.device_info.role == 0
         assert device.device_info.fw_ver == '1.0.19 Build 200224 Rel.090814'
-        assert device.device_info.app_server_url == 'http://localhost:8080'
+        assert device.device_info.app_server_url == 'http://127.0.0.1:8080'
         assert device.device_info.device_region == 'us-east-1'
         assert device.device_info.device_id == device_id
         assert device.device_info.device_name == 'Wi-Fi Smart Power Strip'
@@ -162,7 +162,7 @@ class TestFindDevice(object):
         assert device.device_info.device_type == 'IOT.SMARTBULB'
         assert device.device_info.role == 0
         assert device.device_info.fw_ver == '1.0.8 Build 210121 Rel.084339'
-        assert device.device_info.app_server_url == 'http://localhost:8080'
+        assert device.device_info.app_server_url == 'http://127.0.0.1:8080'
         assert device.device_info.device_region == 'us-east-1'
         assert device.device_info.device_id == device_id
         assert device.device_info.device_name == 'Kasa Smart Light Strip, Multicolor'

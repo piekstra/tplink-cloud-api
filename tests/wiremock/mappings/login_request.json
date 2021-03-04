@@ -6,7 +6,7 @@
             { 
                 "equalToJson" : { 
                     "method": "login", 
-                    "url": "http://localhost:8080", 
+                    "url": "http://127.0.0.1:8080", 
                     "params": { 
                         "appType": "Kasa_Android", 
                         "cloudUserName": "kasa_docker", 
