@@ -107,3 +107,32 @@ if devices:
 ### Smart Plugs (Not Power Strips) (HS100, HS103, HS105, HS110, KP115)
 
 These have the same functionality as the Smart Power Strips, though the HS103 and HS105 do not have the power usage features.
+
+## Testing
+
+This project leverages `wiremock` to test the code to some extent. Note this will not protect the project from changes that TP-Link makes to their API, but instead verifies that the existing code functions consistently as written.
+
+### Local Testing 
+
+Note that the tests setup leverages the [`local_env_vars.py`](tests/local_env_vars.py) file. The values for those environment variables need to be set based on the following:
+
+* `TPLINK_KASA_USERNAME`: `kasa_docker` - This must have parity with the `login` `body` specified in [`tests/wiremock/mappings/login_request.json`](tests/wiremock/mappings/login_request.json)
+* `TPLINK_KASA_PASSWORD`: `kasa_password` - This must have parity with the `login` `body` specified in [`tests/wiremock/mappings/login_request.json`](tests/wiremock/mappings/login_request.json)
+* `TPLINK_KASA_TERM_ID`: `2a8ced52-f200-4b79-a1fe-2f6b58193c4c` - This must be a UUID V4 string and must have parity with the `login` `body` specified in [`tests/wiremock/mappings/login_request.json`](tests/wiremock/mappings/login_request.json). It must also match the `termID` query parameter in all mocked requests found [here](tests/wiremock/mappings)
+* `TPLINK_KASA_API_URL`: `http://127.0.0.1:8080` - This URL is simply `http://127.0.0.1` but the url port must have parity with the [`docker-compose.yaml`](docker-compose.yaml) wiremock service's exposed http `port`. 
+
+To run tests, you will first need to start the wiremock service by running:
+
+```
+docker-compose up -d
+```
+
+Then, you can run the actual tests with the following command:
+
+```
+pytest --verbose
+```
+
+### GitHub Testing
+
+This project leverages GitHub Actions and has a [workflow](.github/workflows/python-package.yml) that will run these tests. The environment configuration for the tests must have parity with the [`local_env_vars.py`](tests/local_env_vars.py) file from the [local testing](#local-testing).

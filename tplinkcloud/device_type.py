@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class TPLinkDeviceType(Enum):
     HS100 = 100
     HS103 = 103

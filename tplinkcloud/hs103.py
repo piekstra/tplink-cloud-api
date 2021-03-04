@@ -1,14 +1,16 @@
 from .device_type import TPLinkDeviceType
 from .device import TPLinkDevice
 
+
 class HS103Action:
-    
+
     def __init__(self, action):
-        self.action = action.get('type')
+        self.action = action.get('action')
+
 
 class HS103SysInfo:
 
-    def __init__(self, sys_info):      
+    def __init__(self, sys_info):
         self.sw_ver = sys_info.get('sw_ver')
         self.hw_ver = sys_info.get('hw_ver')
         self.model = sys_info.get('model')
@@ -31,7 +33,8 @@ class HS103SysInfo:
         self.icon_hash = sys_info.get('icon_hash')
         self.dev_name = sys_info.get('dev_name')
         self.next_action = HS103Action(sys_info.get('next_action'))
-        self.err_code = sys_info.get('err_code')  
+        self.err_code = sys_info.get('err_code')
+
 
 class HS103(TPLinkDevice):
 

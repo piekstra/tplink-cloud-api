@@ -1,6 +1,5 @@
 from .device_type import TPLinkDeviceType
 
-import json
 
 class TPLinkDevice:
 
@@ -9,8 +8,8 @@ class TPLinkDevice:
         self.device_info = device_info
         # child_ids are used for addressing children
         self.child_id = child_id
-        self.client = client
-        self.model_type = TPLinkDeviceType.UNKNOWN     
+        self._client = client
+        self.model_type = TPLinkDeviceType.UNKNOWN
 
     # This is expected to be overriden for devices that have children
     def has_children(self):
@@ -34,7 +33,8 @@ class TPLinkDevice:
             request_data['context'] = {
                 'child_ids': [self.child_id] if self.child_id else None
             }
-        response = self.client.pass_through_request(self.device_id, request_data)
+        response = self._client.pass_through_request(
+            self.device_id, request_data)
         if not response:
             return None
 
@@ -44,14 +44,14 @@ class TPLinkDevice:
             for child in sub_request_response.get('children'):
                 if child.get('id') == self.child_id:
                     return child
-                    
+
         return sub_request_response
 
     def power_on(self):
-        return self._pass_through_request('system', 'set_relay_state', { 'state': 1 })
+        return self._pass_through_request('system', 'set_relay_state', {'state': 1})
 
     def power_off(self):
-        return self._pass_through_request('system', 'set_relay_state', { 'state': 0 })
+        return self._pass_through_request('system', 'set_relay_state', {'state': 0})
 
     def toggle(self):
         if self.is_on():
@@ -62,14 +62,15 @@ class TPLinkDevice:
     def _get_sys_info(self):
         return self._pass_through_request('system', 'get_sysinfo', None)
 
-    # This is intended to be overriden by actual device 
+    # This is intended to be overriden by actual device
     # implementations where sys info is well-defined
     def get_sys_info(self):
         return self._get_sys_info()
 
     def is_on(self):
         device_sys_info = self.get_sys_info()
-        sys_info = device_sys_info.__dict__ if hasattr(device_sys_info, '__dict__') else device_sys_info
+        sys_info = device_sys_info.__dict__ if hasattr(
+            device_sys_info, '__dict__') else device_sys_info
         if self.child_id:
             return sys_info['state'] == 1
 
@@ -77,7 +78,8 @@ class TPLinkDevice:
 
     def is_off(self):
         device_sys_info = self.get_sys_info()
-        sys_info = device_sys_info.__dict__ if hasattr(device_sys_info, '__dict__') else device_sys_info
+        sys_info = device_sys_info.__dict__ if hasattr(
+            device_sys_info, '__dict__') else device_sys_info
         if self.child_id:
             return sys_info['state'] == 0
 
@@ -87,10 +89,9 @@ class TPLinkDevice:
         # This is intentional - follows the API contract
         led_off_state = 0 if on else 1
         return self._pass_through_request('set_led_off', 'off', led_off_state)
-        
+
     def get_schedule_rules(self):
         return self._pass_through_request('schedule', 'get_rules', {})
 
     def edit_schedule_rule(self, rule):
         return self._pass_through_request('schedule', 'edit_rule', rule)
-    

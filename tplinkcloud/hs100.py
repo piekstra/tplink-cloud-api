@@ -1,6 +1,7 @@
 from .device_type import TPLinkDeviceType
 from .emeter_device import TPLinkEMeterDevice
 
+
 class HS100Action:
 
     def __init__(self, action):
@@ -9,8 +10,8 @@ class HS100Action:
 
 class HS100SysInfo:
 
-    def __init__(self, sys_info):    
-        self.err_code = sys_info.get('err_code')    
+    def __init__(self, sys_info):
+        self.err_code = sys_info.get('err_code')
         self.sw_ver = sys_info.get('sw_ver')
         self.hw_ver = sys_info.get('hw_ver')
         self.type = sys_info.get('type')
@@ -32,6 +33,7 @@ class HS100SysInfo:
         self.led_off = sys_info.get('led_off')
         self.latitude = sys_info.get('latitude')
         self.longitude = sys_info.get('longitude')
+
 
 class HS100(TPLinkEMeterDevice):
 
