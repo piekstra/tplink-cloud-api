@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+
+    mock-tplink-api:
+      image: rodolpheche/wiremock
+      ports:
+        # HTTP
+        - "8080:8080" 
+        # HTTPS
+        # - "8443:8443"
+      volumes:
+        - ./tests/wiremock:/home/wiremock

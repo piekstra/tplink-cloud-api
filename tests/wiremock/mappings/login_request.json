@@ -1,0 +1,28 @@
+{
+    "request": {
+        "method": "POST",
+        "url": "/?appName=Kasa_Android&termID=2a8ced52-f200-4b79-a1fe-2f6b58193c4c&appVer=1.4.4.607&ospf=Android%2B6.0.1&netType=wifi&locale=es_ES",
+        "bodyPatterns": [ 
+            { 
+                "equalToJson" : { 
+                    "method": "login", 
+                    "url": "http://localhost:8080", 
+                    "params": { 
+                        "appType": "Kasa_Android", 
+                        "cloudUserName": "kasa_docker", 
+                        "cloudPassword": "kasa_password", 
+                        "terminalUUID": "2a8ced52-f200-4b79-a1fe-2f6b58193c4c"
+                    }
+                } 
+            } 
+        ],
+        "headers": {
+            "User-Agent": { "equalTo": "Dalvik/2.1.0 (Linux; U; Android 6.0.1; A0001 Build/M4B30X)" },
+            "Content-Type": { "equalTo": "application/json" }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "login_response.json" 
+    }
+}

@@ -1,5 +1,5 @@
 class TPLinkDeviceInfo:
-    
+
     def __init__(self, device_info):
         self.device_type = device_info.get('deviceType')
         self.role = device_info.get('role')

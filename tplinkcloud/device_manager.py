@@ -13,14 +13,26 @@ from .hs300 import HS300
 from .kp115 import KP115
 from .device import TPLinkDevice
 
+
 class TPLinkDeviceManager:
 
-    def __init__(self, username, password, prefetch=True, cache_devices=True, tplink_cloud_api_host=None, verbose=False):
+    def __init__(
+        self,
+        username,
+        password,
+        prefetch=True,
+        cache_devices=True,
+        tplink_cloud_api_host=None,
+        verbose=False,
+        term_id=None
+    ):
         self._verbose = verbose
         self._cache_devices = cache_devices
         self._cached_devices = None
+        self._term_id = term_id
 
-        self._tplink_api = TPLinkApi(tplink_cloud_api_host, verbose=self._verbose)
+        self._tplink_api = TPLinkApi(
+            tplink_cloud_api_host, verbose=self._verbose, term_id=self._term_id)
         # We should only need to get this once
         self._auth_token = self._tplink_api.login(username, password)
         # Fetch the devices up front if prefetch and cache them if caching
@@ -31,8 +43,9 @@ class TPLinkDeviceManager:
         if self._cached_devices:
             return self._cached_devices
 
-        device_info_list = self._tplink_api.get_device_info_list(self._auth_token)
-    
+        device_info_list = self._tplink_api.get_device_info_list(
+            self._auth_token)
+
         devices = await asyncio.gather(
             *[self._construct_device(device_info) for device_info in device_info_list]
         )
@@ -47,7 +60,7 @@ class TPLinkDeviceManager:
         if self._cache_devices:
             self._device_info_list = device_info_list
             self._cached_devices = devices
-        
+
         return devices
 
     async def _construct_device(self, device_info):
@@ -57,7 +70,8 @@ class TPLinkDeviceManager:
         client = TPLinkDeviceClient(
             tplink_device_info.app_server_url,
             self._auth_token,
-            verbose=self._verbose
+            verbose=self._verbose,
+            term_id=self._term_id
         )
         if tplink_device_info.device_model.startswith('HS100'):
             return HS100(client, tplink_device_info.device_id, tplink_device_info)
@@ -83,14 +97,14 @@ class TPLinkDeviceManager:
         for device in devices:
             if device.get_alias() == device_name:
                 return device
-        
+
         return None
-    
+
     def find_devices(self, device_names_like):
         devices = self.get_devices()
         matching_devices = []
         for device in devices:
             if device_names_like.lower() in device.get_alias().lower():
                 matching_devices.append(device)
-        
+
         return matching_devices

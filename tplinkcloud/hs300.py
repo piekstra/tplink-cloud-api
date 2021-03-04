@@ -2,6 +2,7 @@ from .device_type import TPLinkDeviceType
 from .emeter_device import TPLinkEMeterDevice
 from .hs300_child import HS300Child, HS300ChildSysInfo
 
+
 class HS300SysInfo:
 
     def __init__(self, sys_info):
@@ -21,22 +22,25 @@ class HS300SysInfo:
         self.mac = sys_info.get('mac')
         self.updating = sys_info.get('updating')
         self.led_off = sys_info.get('led_off')
-        self.children = [HS300ChildSysInfo(child_info) for child_info in sys_info.get('children')]
+        self.children = [HS300ChildSysInfo(child_info)
+                         for child_info in sys_info.get('children')]
         self.child_num = sys_info.get('child_num')
         self.err_code = sys_info.get('err_code')
+
 
 class HS300(TPLinkEMeterDevice):
 
     def __init__(self, client, device_id, device_info):
         super().__init__(client, device_id, device_info)
         self.model_type = TPLinkDeviceType.HS300
-    
+
     async def get_children(self):
         sys_info = self.get_sys_info()
         children = []
         if sys_info:
             for child_info in sys_info.children:
-                device_child = HS300Child(self.client, sys_info.device_id, child_info.id, child_info)
+                device_child = HS300Child(
+                    self._client, sys_info.device_id, child_info.id, child_info)
                 children.append(device_child)
         return children
 

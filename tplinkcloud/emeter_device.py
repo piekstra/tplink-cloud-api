@@ -1,5 +1,6 @@
 from .device import TPLinkDevice
 
+
 class CurrentPower:
 
     def __init__(self, realtime_data):
@@ -7,7 +8,8 @@ class CurrentPower:
         self.current_ma = realtime_data.get('current_ma')
         self.power_mw = realtime_data.get('power_mw')
         self.total_wh = realtime_data.get('total_wh')
-    
+
+
 class DayPowerSummary:
 
     def __init__(self, day_data):
@@ -16,6 +18,7 @@ class DayPowerSummary:
         self.day = day_data.get('day')
         self.energy_wh = day_data.get('energy_wh')
 
+
 class MonthPowerSummary:
 
     def __init__(self, day_data):
@@ -23,22 +26,24 @@ class MonthPowerSummary:
         self.month = day_data.get('month')
         self.energy_wh = day_data.get('energy_wh')
 
+
 class TPLinkEMeterDevice(TPLinkDevice):
 
     def __init__(self, client, device_id, device_info, child_id=None):
         super().__init__(client, device_id, device_info, child_id)
 
     def get_power_usage_realtime(self):
-        realtime_data = self._pass_through_request('emeter', 'get_realtime', None)
+        realtime_data = self._pass_through_request(
+            'emeter', 'get_realtime', None)
         if realtime_data['err_code'] == 0:
             return CurrentPower(realtime_data)
         return None
-    
+
     def get_power_usage_day(self, year, month):
         day_response_data = self._pass_through_request(
-            'emeter', 
-            'get_daystat', 
-            { 
+            'emeter',
+            'get_daystat',
+            {
                 'year': year,
                 'month': month
             }
@@ -47,12 +52,11 @@ class TPLinkEMeterDevice(TPLinkDevice):
             return [DayPowerSummary(day_data) for day_data in day_response_data['day_list']]
         return []
 
-
     def get_power_usage_month(self, year):
         month_response_data = self._pass_through_request(
             'emeter',
             'get_monthstat',
-            { 
+            {
                 'year': year
             }
         )

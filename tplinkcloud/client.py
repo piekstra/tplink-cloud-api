@@ -1,12 +1,15 @@
-import requests, json, uuid
+import requests
+import json
+import uuid
 
 from .api_response import TPLinkApiResponse
 
+
 class TPLinkApi:
-    def __init__(self, host=None, verbose=False):
+    def __init__(self, host=None, verbose=False, term_id=None):
         self.host = host if host else 'https://wap.tplinkcloud.com'
         self._verbose = verbose
-        self._termId = str(uuid.uuid4())
+        self._termId = term_id if term_id else str(uuid.uuid4())
         self._default_params = {
             'appName': 'Kasa_Android',
             'termID': self._termId,
@@ -20,7 +23,7 @@ class TPLinkApi:
                 'Dalvik/2.1.0 (Linux; U; Android 6.0.1; A0001 Build/M4B30X)',
             'Content-Type': 'application/json'
         }
-    
+
     def _request_post(self, body, token=None):
         if self._verbose:
             print('POST', self.host, body)
@@ -35,8 +38,8 @@ class TPLinkApi:
 
         s = requests.Session()
         response = s.request(
-            'POST', 
-            self.host, 
+            'POST',
+            self.host,
             data=body_json,
             params=params,
             headers=self._headers
@@ -48,10 +51,11 @@ class TPLinkApi:
                 print(json.dumps(response_json, indent=2))
             return TPLinkApiResponse(response_json)
         elif response.content:
-            raise Exception(str(response.status_code) + ': ' + response.reason + ': ' + str(response.content))
+            raise Exception(str(response.status_code) + ': ' +
+                            response.reason + ': ' + str(response.content))
         else:
             raise Exception(str(response.status_code) + ': ' + response.reason)
-    
+
     # Returns a token if properly authenticated
     def login(self, username, password):
         body = {
@@ -69,7 +73,7 @@ class TPLinkApi:
             return response.result.get('token')
 
         return None
-    
+
     def get_device_info_list(self, token):
         body = {
             'method': 'getDeviceList'
@@ -77,5 +81,5 @@ class TPLinkApi:
         response = self._request_post(body, token)
         if response.successful:
             return response.result.get('deviceList')
-        
+
         return []

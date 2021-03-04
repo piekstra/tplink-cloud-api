@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-__version__ = '1.2.1'
+__version__ = '2.0.0'
 
 with open('README.md', 'r', encoding='utf-8') as readme:
     long_description = readme.read()
@@ -11,13 +11,13 @@ setup(
     name='tplink-cloud-api',
     author='Dev Piekstra',
     author_email='piekstra.dev@gmail.com',
-    packages=find_packages(),
+    packages=find_packages(exclude=("tests",)),
     version=__version__,
     description='Python library for communicating with the TP-Link Cloud API to manage TP-Link Kasa Smart Home devices',
     long_description=long_description,
     long_description_content_type='text/markdown',
     install_requires=[
-        'requests'
+        'requests==2.22.0'
     ],
     url='https://github.com/piekstra/tplink-cloud-api',
     python_requires='>=3.6',

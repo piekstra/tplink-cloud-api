@@ -1,10 +1,12 @@
 from .device_type import TPLinkDeviceType
 from .hs110 import HS110, HS110SysInfo
 
+
 class KP115SysInfo(HS110SysInfo):
 
     def __init__(self, sys_info):
         super().__init__(sys_info)
+
 
 class KP115(HS110):
 

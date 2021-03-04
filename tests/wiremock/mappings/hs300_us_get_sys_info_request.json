@@ -1,0 +1,25 @@
+{
+    "request": {
+        "method": "POST",
+        "url": "/?appName=Kasa_Android&termID=2a8ced52-f200-4b79-a1fe-2f6b58193c4c&appVer=1.4.4.607&ospf=Android%2B6.0.1&netType=wifi&locale=es_ES&token=abcdef-AB1234cdeTKJH123kja0",
+        "bodyPatterns": [
+            {
+                "equalToJson" : { 
+                    "method": "passthrough",
+                    "params": {
+                        "deviceId": "5BFA53B31294DDA5AB4DEBA1B62582E8EC2F789E",
+                        "requestData": "{\"system\": {\"get_sysinfo\": null}}"
+                    }
+                }
+            }
+        ],
+        "headers": {
+            "User-Agent": { "equalTo": "Dalvik/2.1.0 (Linux; U; Android 6.0.1; A0001 Build/M4B30X)" },
+            "Content-Type": { "equalTo": "application/json" }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "hs300_us_get_sys_info_response.json"
+    }
+}
