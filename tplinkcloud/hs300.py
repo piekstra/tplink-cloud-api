@@ -34,7 +34,7 @@ class HS300(TPLinkEMeterDevice):
         super().__init__(client, device_id, device_info)
         self.model_type = TPLinkDeviceType.HS300
 
-    async def get_children(self):
+    def get_children(self):
         sys_info = self.get_sys_info()
         children = []
         if sys_info:
