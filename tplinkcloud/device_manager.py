@@ -11,6 +11,7 @@ from .hs105 import HS105
 from .hs110 import HS110
 from .hs300 import HS300
 from .kp115 import KP115
+from .kp303 import KP303
 from .device import TPLinkDevice
 
 
@@ -85,6 +86,8 @@ class TPLinkDeviceManager:
             return HS300(client, tplink_device_info.device_id, tplink_device_info)
         elif tplink_device_info.device_model.startswith('KP115'):
             return KP115(client, tplink_device_info.device_id, tplink_device_info)
+        elif tplink_device_info.device_model.startswith('KP303'):
+            return KP303(client, tplink_device_info.device_id, tplink_device_info)
         else:
             return TPLinkDevice(client, tplink_device_info.device_id, tplink_device_info)
 
