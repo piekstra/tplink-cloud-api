@@ -32,4 +32,9 @@ class KP303Child(TPLinkEMeterDevice):
 
     def get_sys_info(self):
         sys_info = self._get_sys_info()
+        
+        if not sys_info:
+            print("Something went wrong with your request; please try again")
+            return None
+        
         return KP303ChildSysInfo(sys_info)
