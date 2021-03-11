@@ -19,6 +19,7 @@ The following devices are _officially_ supported by the library at this time:
 * HS105 (Smaller Single-Socket Smart Plug - 15 Amp)
 * HS110 (Older Smart Plug - Blocks two outlets as a single outlet)
 * KP115 (Small Single-Socket Smart Plug - 15 Amp; replacement for HS110)
+* KP303 (Smart Plug Power Strip with 3 Outlets)
 
 # Installation
 
@@ -69,7 +70,7 @@ if devices:
 
 ## Control your devices
 
-### Smart Power Strips (HS300)
+### Smart Power Strips (HS300, KP303)
 
 Toggle a plug:
 
