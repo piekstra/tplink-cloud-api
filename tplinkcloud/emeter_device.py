@@ -34,8 +34,11 @@ class TPLinkEMeterDevice(TPLinkDevice):
 
     def get_power_usage_realtime(self):
         realtime_data = self._pass_through_request(
-            'emeter', 'get_realtime', None)
-        if realtime_data['err_code'] == 0:
+            'emeter', 
+            'get_realtime', 
+            None
+        )
+        if realtime_data.get('err_code') == 0:
             return CurrentPower(realtime_data)
         return None
 
@@ -48,7 +51,8 @@ class TPLinkEMeterDevice(TPLinkDevice):
                 'month': month
             }
         )
-        if day_response_data['err_code'] == 0:
+        # If there is no data for the requested month, data will be None
+        if day_response_data.get('err_code') == 0:
             return [DayPowerSummary(day_data) for day_data in day_response_data['day_list']]
         return []
 
@@ -60,6 +64,7 @@ class TPLinkEMeterDevice(TPLinkDevice):
                 'year': year
             }
         )
-        if month_response_data['err_code'] == 0:
+        # If there is no data for the requested year, data will be None
+        if month_response_data.get('err_code') == 0:
             return [MonthPowerSummary(month_data) for month_data in month_response_data['month_list']]
         return []
