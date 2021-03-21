@@ -58,6 +58,10 @@ class TPLinkApi:
 
     # Returns a token if properly authenticated
     def login(self, username, password):
+        if username is None:
+            raise Exception("Cannot login, username is not set")
+        if password is None:
+            raise Exception("Cannot login, password not set")
         body = {
             'method': 'login',
             'url': self.host,
