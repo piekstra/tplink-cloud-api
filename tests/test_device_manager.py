@@ -190,3 +190,29 @@ class TestFindDevices(object):
 
         assert devices is not None
         assert len(devices) == 2
+
+class TestAuth(object):
+
+    def test_auth_empty_string(self, client):
+        with pytest.raises(Exception):
+            TPLinkDeviceManager(
+                username="",
+                password="",
+                prefetch=False,
+                cache_devices=False,
+                tplink_cloud_api_host=os.environ.get('TPLINK_KASA_API_URL'),
+                verbose=False,
+                term_id=os.environ.get('TPLINK_KASA_TERM_ID')
+            )
+
+    def test_auth_none(self, client):
+        with pytest.raises(Exception):
+            TPLinkDeviceManager(
+                username=None,
+                password=None,
+                prefetch=False,
+                cache_devices=False,
+                tplink_cloud_api_host=os.environ.get('TPLINK_KASA_API_URL'),
+                verbose=False,
+                term_id=os.environ.get('TPLINK_KASA_TERM_ID')
+            )
