@@ -1,0 +1,6 @@
+{
+    "error_code": 0,
+    "result": {
+        "responseData": "{\"netif\":{\"get_stainfo\":{\"ssid\":\"My WiFi Network\",\"key_type\":3,\"rssi\":-39,\"err_code\":0}}}"
+    }
+}

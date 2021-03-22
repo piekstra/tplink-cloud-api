@@ -1,4 +1,5 @@
 from .device_type import TPLinkDeviceType
+from .device_net_info import DeviceNetInfo
 
 
 class TPLinkDevice:
@@ -95,3 +96,10 @@ class TPLinkDevice:
 
     def edit_schedule_rule(self, rule):
         return self._pass_through_request('schedule', 'edit_rule', rule)
+
+    # Get SSID of network to which the device is connected
+    def get_net_info(self):
+        net_info = self._pass_through_request('netif', 'get_stainfo', None)
+        if net_info:
+            return DeviceNetInfo(net_info)
+        return None

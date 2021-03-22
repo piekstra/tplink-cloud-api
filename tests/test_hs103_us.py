@@ -23,7 +23,6 @@ class TestHS103USDevice(object):
     def test_get_sys_info_gets_info(self, client):
         device_name = 'Bedroom Desk Light'
         device = client.find_device(device_name)
-        print(device.get_alias())
         sys_info = device.get_sys_info()
 
         assert sys_info is not None
