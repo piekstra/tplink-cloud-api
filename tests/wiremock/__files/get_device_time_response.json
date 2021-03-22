@@ -1,0 +1,6 @@
+{
+    "error_code": 0,
+    "result": {
+        "responseData": "{\"time\":{\"get_time\":{\"year\":2021,\"month\":3,\"mday\":22,\"hour\":12,\"min\":55,\"sec\":41,\"err_code\":0}}}"
+    }
+}

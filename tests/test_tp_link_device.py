@@ -30,3 +30,17 @@ class TestTPLinkDevice(object):
         assert net_info.key_type == 3
         assert net_info.rssi == -39
         assert net_info.err_code == 0
+
+    def test_get_time_gets_time(self, client):
+        device_name = 'Left Lamp'
+        device = client.find_device(device_name)
+        time = device.get_time()
+
+        assert time is not None
+        assert time.year == 2021
+        assert time.month == 3
+        assert time.mday == 22
+        assert time.hour == 12
+        assert time.min == 55
+        assert time.sec == 41
+        assert time.err_code == 0
