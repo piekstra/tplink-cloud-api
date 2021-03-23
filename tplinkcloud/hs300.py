@@ -1,3 +1,5 @@
+import asyncio
+
 from .device_type import TPLinkDeviceType
 from .emeter_device import TPLinkEMeterDevice
 from .hs300_child import HS300Child, HS300ChildSysInfo
@@ -34,8 +36,8 @@ class HS300(TPLinkEMeterDevice):
         super().__init__(client, device_id, device_info)
         self.model_type = TPLinkDeviceType.HS300
 
-    def get_children(self):
-        sys_info = self.get_sys_info()
+    async def get_children_async(self):
+        sys_info = await self.get_sys_info_async()
         children = []
         if sys_info:
             for child_info in sys_info.children:
@@ -48,11 +50,14 @@ class HS300(TPLinkEMeterDevice):
     def has_children(self):
         return True
 
-    def get_sys_info(self):
-        sys_info = self._get_sys_info()
+    async def get_sys_info_async(self):
+        sys_info = await self._get_sys_info_async()
         
         if not sys_info:
             print("Something went wrong with your request; please try again")
             return None
         
         return HS300SysInfo(sys_info)
+    
+    def get_sys_info(self):
+        return asyncio.run(self.get_sys_info_async())

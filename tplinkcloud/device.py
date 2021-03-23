@@ -1,3 +1,5 @@
+import asyncio
+
 from .device_type import TPLinkDeviceType
 from .device_net_info import DeviceNetInfo
 from .device_time import DeviceTime
@@ -18,14 +20,18 @@ class TPLinkDevice:
         return False
 
     # This is expected to be overriden for devices that have children
-    def get_children(self):
+    async def get_children_async(self):
         return None
+
+    # This may be overriden for devices that have children
+    def get_children(self):
+        return asyncio.run(self.get_children_async())
 
     def get_alias(self):
         return self.device_info.alias
 
     # All device requests should go through here
-    def _pass_through_request(self, request_type, sub_request_type, request):
+    async def _pass_through_request_async(self, request_type, sub_request_type, request):
         request_data = {
             request_type: {
                 sub_request_type: request
@@ -35,7 +41,7 @@ class TPLinkDevice:
             request_data['context'] = {
                 'child_ids': [self.child_id] if self.child_id else None
             }
-        response = self._client.pass_through_request(
+        response = await self._client.pass_through_request_async(
             self.device_id, request_data)
         if not response:
             return None
@@ -49,6 +55,9 @@ class TPLinkDevice:
 
         return sub_request_response
 
+    def _pass_through_request(self, request_type, sub_request_type, request):
+        return asyncio.run(self._pass_through_request_async(request_type, sub_request_type, request))
+
     def power_on(self):
         return self._pass_through_request('system', 'set_relay_state', {'state': 1})
 
@@ -61,8 +70,11 @@ class TPLinkDevice:
         else:
             self.power_on()
 
+    async def _get_sys_info_async(self):
+        return await self._pass_through_request_async('system', 'get_sysinfo', None)
+
     def _get_sys_info(self):
-        return self._pass_through_request('system', 'get_sysinfo', None)
+        return asyncio.run(self._get_sys_info_async())
 
     # This is intended to be overriden by actual device
     # implementations where sys info is well-defined
