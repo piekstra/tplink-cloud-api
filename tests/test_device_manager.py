@@ -193,11 +193,11 @@ class TestFindDevices(object):
 
 class TestAuth(object):
 
-    def test_auth_empty_string(self, client):
-        with pytest.raises(Exception):
+    def test_auth_no_username(self, client):
+        with pytest.raises(ValueError):
             TPLinkDeviceManager(
-                username="",
-                password="",
+                username=None,
+                password=os.environ.get('TPLINK_KASA_PASSWORD'),
                 prefetch=False,
                 cache_devices=False,
                 tplink_cloud_api_host=os.environ.get('TPLINK_KASA_API_URL'),
@@ -205,10 +205,10 @@ class TestAuth(object):
                 term_id=os.environ.get('TPLINK_KASA_TERM_ID')
             )
 
-    def test_auth_none(self, client):
-        with pytest.raises(Exception):
+    def test_auth_no_password(self, client):
+        with pytest.raises(ValueError):
             TPLinkDeviceManager(
-                username=None,
+                username=os.environ.get('TPLINK_KASA_USERNAME'),
                 password=None,
                 prefetch=False,
                 cache_devices=False,
