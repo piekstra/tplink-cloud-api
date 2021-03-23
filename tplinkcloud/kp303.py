@@ -1,7 +1,7 @@
 import asyncio
 
 from .device_type import TPLinkDeviceType
-from .emeter_device import TPLinkEMeterDevice
+from .device import TPLinkDevice
 from .kp303_child import KP303Child, KP303ChildSysInfo
 
 
@@ -30,7 +30,7 @@ class KP303SysInfo:
         self.err_code = sys_info.get('err_code')
 
 
-class KP303(TPLinkEMeterDevice):
+class KP303(TPLinkDevice):
 
     def __init__(self, client, device_id, device_info):
         super().__init__(client, device_id, device_info)
