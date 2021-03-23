@@ -191,6 +191,7 @@ class TestFindDevices(object):
         assert devices is not None
         assert len(devices) == 2
 
+@pytest.mark.usefixtures('client')
 class TestAuth(object):
 
     def test_auth_no_username(self, client):
