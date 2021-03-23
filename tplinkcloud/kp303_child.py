@@ -1,5 +1,5 @@
 from .device_type import TPLinkDeviceType
-from .emeter_device import TPLinkEMeterDevice
+from .device import TPLinkDevice
 
 
 class KP303ChildAction:
@@ -19,7 +19,7 @@ class KP303ChildSysInfo:
         self.next_action = KP303ChildAction(child_info.get('next_action'))
 
 
-class KP303Child(TPLinkEMeterDevice):
+class KP303Child(TPLinkDevice):
 
     def __init__(self, client, parent_device_id, child_device_id, device_info):
         super().__init__(
