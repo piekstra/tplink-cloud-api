@@ -1,4 +1,5 @@
-import requests
+import asyncio
+import aiohttp
 import json
 import uuid
 
@@ -26,34 +27,35 @@ class TPLinkDeviceClient:
             'Content-Type': 'application/json'
         }
 
-    def _request_post(self, body):
+    async def _request_post_async(self, body):
         if self._verbose:
             print('POST', self.host, body)
 
         body_json = json.dumps(body)
 
-        s = requests.Session()
-        response = s.request(
-            'POST',
-            self.host,
-            data=body_json,
-            params=self._params,
-            headers=self._headers,
-            timeout=600
-        )
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                self.host,
+                data=body_json,
+                params=self._params,
+                headers=self._headers,
+                timeout=600
+            ) as response:
+                if response.status == 200:
+                    response_json = await response.json(content_type=None)
+                    if self._verbose:
+                        print(json.dumps(response_json, indent=2))
+                    return TPLinkApiResponse(response_json)
+                elif response.content:
+                    raise Exception(str(response.status) + ': ' +
+                                    response.reason + ': ' + str(response.content))
+                else:
+                    raise Exception(str(response.status) + ': ' + response.reason)
+    
+    def _request_post(self, body):
+        return asyncio.run(self._request_post_async(body))
 
-        if response.status_code == 200:
-            response_json = response.json()
-            if self._verbose:
-                print(json.dumps(response_json, indent=2))
-            return TPLinkApiResponse(response_json)
-        elif response.content:
-            raise Exception(str(response.status_code) + ': ' +
-                            response.reason + ': ' + str(response.content))
-        else:
-            raise Exception(str(response.status_code) + ': ' + response.reason)
-
-    def pass_through_request(self, device_id, request_data):
+    async def pass_through_request_async(self, device_id, request_data):
         body = {
             'method': 'passthrough',
             'params': {
@@ -61,8 +63,11 @@ class TPLinkDeviceClient:
                 'requestData': json.dumps(request_data)
             }
         }
-        response = self._request_post(body)
+        response = await self._request_post_async(body)
         if response.successful:
             return json.loads(response.result.get('responseData'))
 
         return None
+
+    def pass_through_request(self, device_id, request_data):
+        return asyncio.run(self.pass_through_request_async(device_id, request_data))

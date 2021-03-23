@@ -1,3 +1,5 @@
+import asyncio
+
 from .device_info import TPLinkDeviceInfo
 from .device_client import TPLinkDeviceClient
 from .client import TPLinkApi
@@ -36,9 +38,9 @@ class TPLinkDeviceManager:
         self._auth_token = self._tplink_api.login(username, password)
         # Fetch the devices up front if prefetch and cache them if caching
         if prefetch and self._cache_devices:
-            self._fetch_devices()
+            self.get_devices()
 
-    def _fetch_devices(self):
+    async def _fetch_devices(self):
         if self._cached_devices:
             return self._cached_devices
 
@@ -46,11 +48,16 @@ class TPLinkDeviceManager:
             self._auth_token)
 
         devices = []
+        children_gather_tasks = []
         for device_info in device_info_list:
             device = self._construct_device(device_info)
             devices.append(device)
             if device.has_children():
-                devices.extend(device.get_children())
+                children_gather_tasks.append(device.get_children_async())
+        
+        devices_children = await asyncio.gather(*children_gather_tasks)
+        for device_children in devices_children:
+            devices.extend(device_children)
 
         if self._cache_devices:
             self._device_info_list = device_info_list
@@ -86,7 +93,7 @@ class TPLinkDeviceManager:
             return TPLinkDevice(client, tplink_device_info.device_id, tplink_device_info)
 
     def get_devices(self):
-        return self._fetch_devices()
+        return asyncio.run(self._fetch_devices())
 
     def find_device(self, device_name):
         devices = self.get_devices()
