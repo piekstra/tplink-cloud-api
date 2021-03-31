@@ -44,3 +44,12 @@ class TestTPLinkDevice(object):
         assert time.min == 55
         assert time.sec == 41
         assert time.err_code == 0
+
+    def test_get_timezone_gets_timezone(self, client):
+        device_name = 'Left Lamp'
+        device = client.find_device(device_name)
+        timezone = device.get_timezone()
+
+        assert timezone is not None
+        assert timezone.index == 6
+        assert timezone.err_code == 0

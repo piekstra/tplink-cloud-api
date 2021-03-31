@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-__version__ = '2.4.2'
+__version__ = '2.5.0'
 
 with open('README.md', 'r', encoding='utf-8') as readme:
     long_description = readme.read()
