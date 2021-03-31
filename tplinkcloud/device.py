@@ -3,7 +3,7 @@ import asyncio
 from .device_type import TPLinkDeviceType
 from .device_net_info import DeviceNetInfo
 from .device_time import DeviceTime
-
+from .device_timezone import DeviceTimezone
 
 class TPLinkDevice:
 
@@ -122,4 +122,10 @@ class TPLinkDevice:
         time = self._pass_through_request('time', 'get_time', {})
         if time:
             return DeviceTime(time)
+        return None
+
+    def get_timezone(self):
+        timezone = self._pass_through_request('time', 'get_timezone', {})
+        if timezone:
+            return DeviceTimezone(timezone)
         return None

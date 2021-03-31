@@ -1,0 +1,6 @@
+{
+    "error_code": 0,
+    "result": {
+        "responseData": "{\"time\":{\"get_timezone\":{\"index\":6,\"err_code\":0}}}"
+    }
+}
