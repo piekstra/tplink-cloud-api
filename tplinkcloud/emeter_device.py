@@ -31,6 +31,10 @@ class TPLinkEMeterDevice(TPLinkDevice):
 
     def __init__(self, client, device_id, device_info, child_id=None):
         super().__init__(client, device_id, device_info, child_id)
+    
+    # This is an override for regular devices
+    def has_emeter(self):
+        return True
 
     def get_power_usage_realtime(self):
         realtime_data = self._pass_through_request(
