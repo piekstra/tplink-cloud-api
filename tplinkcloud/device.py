@@ -27,6 +27,10 @@ class TPLinkDevice:
     def get_children(self):
         return asyncio.run(self.get_children_async())
 
+    # This is expected to be overriden for emeter devices
+    def has_emeter(self):
+        return False
+
     def get_alias(self):
         return self.device_info.alias
 

@@ -50,3 +50,11 @@ class TestHS103USDevice(object):
         assert sys_info.next_action is not None
         assert sys_info.next_action.action == -1
         assert sys_info.err_code == 0
+
+    def test_has_emeter_returns_false(self, client):
+        device_name = 'Bedroom Desk Light'
+        device = client.find_device(device_name)
+        has_emeter = device.has_emeter()
+
+        assert has_emeter is not None
+        assert has_emeter == False
