@@ -1,0 +1,6 @@
+{
+    "error_code": 0,
+    "result": {
+        "responseData": "{\"emeter\":{\"get_daystat\":{\"day_list\":[{\"year\":2021,\"month\":3,\"day\":11,\"energy_wh\":10004},{\"year\":2021,\"month\":3,\"day\":12,\"energy_wh\":10021},{\"year\":2021,\"month\":3,\"day\":13,\"energy_wh\":10031},{\"year\":2021,\"month\":3,\"day\":14,\"energy_wh\":9615},{\"year\":2021,\"month\":3,\"day\":15,\"energy_wh\":10147},{\"year\":2021,\"month\":3,\"day\":16,\"energy_wh\":9312},{\"year\":2021,\"month\":3,\"day\":17,\"energy_wh\":6322},{\"year\":2021,\"month\":3,\"day\":18,\"energy_wh\":9488},{\"year\":2021,\"month\":3,\"day\":19,\"energy_wh\":9476},{\"year\":2021,\"month\":3,\"day\":20,\"energy_wh\":9467},{\"year\":2021,\"month\":3,\"day\":21,\"energy_wh\":9516},{\"year\":2021,\"month\":3,\"day\":22,\"energy_wh\":9508},{\"year\":2021,\"month\":3,\"day\":23,\"energy_wh\":9469},{\"year\":2021,\"month\":3,\"day\":24,\"energy_wh\":9553},{\"year\":2021,\"month\":3,\"day\":25,\"energy_wh\":9631},{\"year\":2021,\"month\":3,\"day\":26,\"energy_wh\":9236},{\"year\":2021,\"month\":3,\"day\":27,\"energy_wh\":9577},{\"year\":2021,\"month\":3,\"day\":28,\"energy_wh\":9571},{\"year\":2021,\"month\":3,\"day\":29,\"energy_wh\":9554},{\"year\":2021,\"month\":3,\"day\":30,\"energy_wh\":9468},{\"year\":2021,\"month\":3,\"day\":31,\"energy_wh\":8876}],\"err_code\":0}}}"
+    }
+}

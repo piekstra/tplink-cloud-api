@@ -1,0 +1,6 @@
+{
+    "error_code": 0,
+    "result": {
+        "responseData": "{\"emeter\":{\"get_monthstat\":{\"month_list\":[],\"err_code\":0}}}"
+    }
+}

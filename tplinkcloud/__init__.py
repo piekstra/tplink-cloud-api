@@ -1,6 +1,7 @@
 from .device_manager import TPLinkDeviceManager
+from .device_manager_power_tools import TPLinkDeviceManagerPowerTools
 
-__all__ = ['TPLinkDeviceManager', ]
+__all__ = ['TPLinkDeviceManager', 'TPLinkDeviceManagerPowerTools', ]
 
 # Windows OS-specific HACK to silence exception thrown on event loop being closed
 # as part of the asyncio library's proactor

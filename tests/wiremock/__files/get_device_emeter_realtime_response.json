@@ -1,0 +1,6 @@
+{
+    "error_code": 0,
+    "result": {
+        "responseData": "{\"emeter\":{\"get_realtime\":{\"voltage_mv\":823465,\"current_ma\":1245,\"power_mw\":854155,\"total_wh\":894928,\"err_code\":0}}}"
+    }
+}

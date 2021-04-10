@@ -1,0 +1,6 @@
+{
+    "error_code": 0,
+    "result": {
+        "responseData": "{\"emeter\":{\"get_daystat\":{\"day_list\":[{\"year\":2021,\"month\":4,\"day\":5,\"energy_wh\":9401},{\"year\":2021,\"month\":4,\"day\":6,\"energy_wh\":9399},{\"year\":2021,\"month\":4,\"day\":7,\"energy_wh\":9408},{\"year\":2021,\"month\":4,\"day\":8,\"energy_wh\":9392},{\"year\":2021,\"month\":4,\"day\":9,\"energy_wh\":5832},{\"year\":2021,\"month\":4,\"day\":1,\"energy_wh\":9401},{\"year\":2021,\"month\":4,\"day\":2,\"energy_wh\":9387},{\"year\":2021,\"month\":4,\"day\":3,\"energy_wh\":9378},{\"year\":2021,\"month\":4,\"day\":4,\"energy_wh\":9383}],\"err_code\":0}}}"
+    }
+}
