@@ -23,7 +23,7 @@ class TestGetDevices(object):
     def test_gets_devices(self, client):
         device_list = client.get_devices()
         assert device_list is not None
-        # 5 devies but the 5th one has 6 children
+        # 5 devices but the 5th one has 6 children
         assert len(device_list) == 11
 
 

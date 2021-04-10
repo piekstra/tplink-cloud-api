@@ -1,3 +1,5 @@
+import asyncio
+
 from .device import TPLinkDevice
 
 
@@ -37,7 +39,10 @@ class TPLinkEMeterDevice(TPLinkDevice):
         return True
 
     def get_power_usage_realtime(self):
-        realtime_data = self._pass_through_request(
+        return asyncio.run(self.get_power_usage_realtime_async())
+
+    async def get_power_usage_realtime_async(self):
+        realtime_data = await self._pass_through_request_async(
             'emeter', 
             'get_realtime', 
             None
@@ -47,7 +52,10 @@ class TPLinkEMeterDevice(TPLinkDevice):
         return None
 
     def get_power_usage_day(self, year, month):
-        day_response_data = self._pass_through_request(
+        return asyncio.run(self.get_power_usage_day_async(year, month))
+
+    async def get_power_usage_day_async(self, year, month):
+        day_response_data = await self._pass_through_request_async(
             'emeter',
             'get_daystat',
             {
@@ -61,7 +69,10 @@ class TPLinkEMeterDevice(TPLinkDevice):
         return []
 
     def get_power_usage_month(self, year):
-        month_response_data = self._pass_through_request(
+        return asyncio.run(self.get_power_usage_month_async(year))
+
+    async def get_power_usage_month_async(self, year):
+        month_response_data = await self._pass_through_request_async(
             'emeter',
             'get_monthstat',
             {
