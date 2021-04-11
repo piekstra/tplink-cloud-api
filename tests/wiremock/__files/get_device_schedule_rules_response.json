@@ -1,0 +1,6 @@
+{
+    "error_code": 0,
+    "result": {
+        "responseData": "{\"schedule\":{\"get_rules\":{\"enable\":1,\"rule_list\":[{\"enable\":1,\"id\":\"7B0F854D3C0384E48EF88E0187BD8F34\",\"name\":\"Schedule Rule\",\"stime_opt\":0,\"smin\":705,\"sact\":1,\"etime_opt\":-1,\"emin\":0,\"eact\":-1,\"wday\":[1,0,1,1,0,1,1],\"repeat\":1,\"year\":0,\"month\":0,\"day\":0},{\"enable\":1,\"id\":\"E6F1B23B134009FDDEA89E59F46E8708\",\"name\":\"Schedule Rule\",\"stime_opt\":1,\"smin\":389,\"sact\":1,\"etime_opt\":-1,\"emin\":0,\"eact\":-1,\"wday\":[1,1,1,1,1,1,1],\"repeat\":1,\"year\":0,\"month\":0,\"day\":0},{\"enable\":1,\"id\":\"558AD8513338E5A4154CFC595BA72B83\",\"name\":\"Schedule Rule\",\"stime_opt\":2,\"smin\":1195,\"sact\":0,\"etime_opt\":-1,\"emin\":0,\"eact\":-1,\"wday\":[0,1,1,1,1,1,0],\"repeat\":1,\"year\":0,\"month\":0,\"day\":0},{\"enable\":0,\"id\":\"FF24375EB7DD5F3D9AEFE22EAA11E436\",\"name\":\"Schedule Rule\",\"stime_opt\":0,\"smin\":719,\"sact\":0,\"etime_opt\":-1,\"emin\":0,\"eact\":-1,\"wday\":[1,0,0,0,0,0,0],\"repeat\":0,\"year\":2021,\"month\":4,\"day\":11}],\"err_code\":0}}}"
+    }
+}
