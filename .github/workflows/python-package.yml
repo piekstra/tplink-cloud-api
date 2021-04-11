@@ -24,6 +24,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     # Start this early in case it needs some "boot up time"
     - name: Start docker containers for tests
+      uses: docker-practice/actions-setup-docker@v1
       run: |
         docker-compose up -d mock-tplink-api
     - name: Install dependencies
