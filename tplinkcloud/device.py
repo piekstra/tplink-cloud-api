@@ -4,6 +4,7 @@ from .device_type import TPLinkDeviceType
 from .device_net_info import DeviceNetInfo
 from .device_time import DeviceTime
 from .device_timezone import DeviceTimezone
+from .device_schedule_rules import DeviceScheduleRules
 
 class TPLinkDevice:
 
@@ -109,7 +110,10 @@ class TPLinkDevice:
         return self._pass_through_request('set_led_off', 'off', led_off_state)
 
     def get_schedule_rules(self):
-        return self._pass_through_request('schedule', 'get_rules', {})
+        schedule_rules = self._pass_through_request('schedule', 'get_rules', {})
+        if schedule_rules is not None:
+            return DeviceScheduleRules(schedule_rules)
+        return None
 
     def edit_schedule_rule(self, rule):
         return self._pass_through_request('schedule', 'edit_rule', rule)
