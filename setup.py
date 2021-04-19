@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-__version__ = '2.8.1'
+__version__ = '2.9.0'
 
 with open('README.md', 'r', encoding='utf-8') as readme:
     long_description = readme.read()

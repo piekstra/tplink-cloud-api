@@ -109,6 +109,68 @@ if devices:
 
 These have the same functionality as the Smart Power Strips, though the HS103 and HS105 do not have the power usage features.
 
+## Add and modify schedule rules for your devices
+
+Edit an existing schedule rule
+
+```python
+from tplinkcloud import TPLinkDeviceManager, TPLinkDeviceScheduleRuleBuilder
+device_name = "My Smart Plug"
+device = device_manager.find_device(device_name)
+if device:
+  print(f'Found {device.model_type.name} device: {device.get_alias()}')
+  print(f'Modifying schedule rule')
+  schedule = device.get_schedule_rules()
+  original_rule = schedule.rules[0]
+  rule_edit = TPLinkDeviceScheduleRuleBuilder(
+    original_rule
+  ).with_enable_status(
+      False
+  )
+  device.edit_schedule_rule(rule_edit.to_json())
+else:  
+  print(f'Could not find {device_name}')
+```
+
+Add a new schedule rule
+
+```python
+from tplinkcloud import TPLinkDeviceManager, TPLinkDeviceScheduleRuleBuilder
+device_name = "My Smart Plug"
+device = device_manager.find_device(device_name)
+if device:
+  print(f'Found {device.model_type.name} device: {device.get_alias()}')
+  print(f'Adding schedule rule')
+  new_rule = TPLinkDeviceScheduleRuleBuilder(
+  ).with_action(
+      turn_on=True
+  ).with_name(
+      'My Schedule Rule'
+  ).with_enable_status(
+      True
+  ).with_sunset_start().with_repeat_on_days(
+      [0, 0, 0, 0, 0, 1, 1]
+  ).build()
+  device.add_schedule_rule(new_rule.to_json())
+else:  
+  print(f'Could not find {device_name}')
+```
+
+Delete a schedule rule
+
+```python
+from tplinkcloud import TPLinkDeviceManager, TPLinkDeviceScheduleRuleBuilder
+device_name = "My Smart Plug"
+device = device_manager.find_device(device_name)
+if device:
+  print(f'Found {device.model_type.name} device: {device.get_alias()}')
+  print(f'Deleting schedule rule')
+  schedule = device.get_schedule_rules()
+  rule = schedule.rules[0]
+  device.delete_schedule_rule(rule.id)
+else:  
+  print(f'Could not find {device_name}')
+
 ## Testing
 
 This project leverages `wiremock` to test the code to some extent. Note this will not protect the project from changes that TP-Link makes to their API, but instead verifies that the existing code functions consistently as written.
