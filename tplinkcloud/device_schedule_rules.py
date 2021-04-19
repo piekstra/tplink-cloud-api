@@ -62,6 +62,26 @@ class DeviceScheduleRule:
             self.hour = self.smin // 60
             self.minute = self.smin % 60
 
+    # These are the values expected and returned by the TP-Link API
+    def to_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'enable': self.enable,
+            'wday': self.wday,
+            'stime_opt': self.stime_opt,
+            'soffset': self.soffset,
+            'smin': self.smin,
+            'sact': self.sact,
+            'etime_opt': self.etime_opt,
+            'eoffset': self.eoffset,
+            'emin': self.emin,
+            'eact': self.eact,
+            'repeat': self.repeat,
+            'year': self.year,
+            'month': self.month,
+            'day': self.day,
+        }
 
 class DeviceScheduleRules:
     

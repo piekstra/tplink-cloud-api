@@ -115,8 +115,28 @@ class TPLinkDevice:
             return DeviceScheduleRules(schedule_rules)
         return None
 
+    def get_schedule_rule(self, rule_id):
+        schedule = self.get_schedule_rules()
+        if not schedule or not schedule.rules:
+            return None
+
+        for rule in schedule.rules:
+            if rule.id == rule_id:
+                return rule
+        
+        return None
+
     def edit_schedule_rule(self, rule):
         return self._pass_through_request('schedule', 'edit_rule', rule)
+        
+    def add_schedule_rule(self, rule):
+        return self._pass_through_request('schedule', 'add_rule', rule)
+
+    def delete_all_scheduled_rules(self):
+        return self._pass_through_request('schedule', 'delete_all_rules', None)
+
+    def delete_schedule_rule(self, rule_id):
+        return self._pass_through_request('schedule', 'delete_rule', {'id': rule_id})
 
     # Get SSID of network to which the device is connected
     def get_net_info(self):
