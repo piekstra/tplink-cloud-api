@@ -47,7 +47,7 @@ class TPLinkEMeterDevice(TPLinkDevice):
             'get_realtime', 
             None
         )
-        if realtime_data.get('err_code') == 0:
+        if realtime_data is not None and realtime_data.get('err_code') == 0:
             return CurrentPower(realtime_data)
         return None
 
