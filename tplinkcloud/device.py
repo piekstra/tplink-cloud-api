@@ -153,7 +153,7 @@ class TPLinkDevice:
         return self._pass_through_request('schedule', 'delete_all_rules', None)
 
     def delete_schedule_rule(self, rule_id):
-        return self._pass_through_request('schedule', 'delete_rule', {'id': rule_id})      
+        return self._pass_through_request('schedule', 'delete_rule', {'id': rule_id})
 
     def get_runtime_day(self, year, month):
         day_response_data = self._pass_through_request(
