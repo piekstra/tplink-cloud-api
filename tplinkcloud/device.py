@@ -6,6 +6,23 @@ from .device_time import DeviceTime
 from .device_timezone import DeviceTimezone
 from .device_schedule_rules import DeviceScheduleRules
 
+class DayRuntimeSummary:
+
+    def __init__(self, day_data):
+        self.year = day_data.get('year')
+        self.month = day_data.get('month')
+        self.day = day_data.get('day')
+        # Time is in minutes
+        self.time = day_data.get('time')
+
+class MonthRuntimeSummary:
+
+    def __init__(self, day_data):
+        self.year = day_data.get('year')
+        self.month = day_data.get('month')
+        # Time is in minutes
+        self.minutes = day_data.get('time')
+
 class TPLinkDevice:
 
     def __init__(self, client, device_id, device_info, child_id=None):
@@ -136,7 +153,34 @@ class TPLinkDevice:
         return self._pass_through_request('schedule', 'delete_all_rules', None)
 
     def delete_schedule_rule(self, rule_id):
-        return self._pass_through_request('schedule', 'delete_rule', {'id': rule_id})
+        return self._pass_through_request('schedule', 'delete_rule', {'id': rule_id})      
+
+    def get_runtime_day(self, year, month):
+        day_response_data = self._pass_through_request(
+            'schedule', 
+            'get_daystat', 
+            {
+                'year': year,
+                'month': month
+            }
+        )
+        # If there is no data for the requested month, data will be None
+        if day_response_data and day_response_data.get('err_code') == 0:
+            return [DayRuntimeSummary(day_data) for day_data in day_response_data['day_list']]
+        return []
+
+    def get_runtime_month(self, year):
+        month_response_data = self._pass_through_request(
+            'schedule', 
+            'get_monthstat', 
+            {
+                'year': year
+            }
+        )
+        # If there is no data for the requested year, data will be None
+        if month_response_data and month_response_data.get('err_code') == 0:
+            return [MonthRuntimeSummary(month_data) for month_data in month_response_data['month_list']]
+        return []
 
     # Get SSID of network to which the device is connected
     def get_net_info(self):
