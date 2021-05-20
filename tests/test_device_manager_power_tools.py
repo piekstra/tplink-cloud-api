@@ -1,8 +1,8 @@
 import os
 import pytest
+from freezegun import freeze_time
 
 from tplinkcloud import TPLinkDeviceManager, TPLinkDeviceManagerPowerTools
-
 
 @pytest.fixture(scope='module')
 def power_tools():
@@ -16,7 +16,6 @@ def power_tools():
     return TPLinkDeviceManagerPowerTools(
         client
     )
-
 
 @pytest.mark.usefixtures('power_tools')
 class TestDeviceManagerPowerTools(object):
@@ -59,7 +58,8 @@ class TestDeviceManagerPowerTools(object):
             assert device_usage.data.total_wh > 0
             assert device_usage.data.voltage_mv > 0
 
-    def test_get_devices_power_usage_day_gets_usage(self, power_tools):
+    @freeze_time("2021-04-09")
+    def test_get_devices_power_usage_day_gets_usage(self, power_tools):        
         devices_like = 'plug'
         usage = power_tools.get_devices_power_usage_day(devices_like)
         
@@ -91,6 +91,7 @@ class TestDeviceManagerPowerTools(object):
                 assert data_item.month == month
                 assert data_item.year == 2021
 
+    @freeze_time("2021-04-09")
     def test_get_devices_power_usage_month_gets_usage(self, power_tools):
         devices_like = 'plug'
         usage = power_tools.get_devices_power_usage_month(devices_like)
