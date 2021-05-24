@@ -1,4 +1,4 @@
-from tplinkcloud.emeter_device import TPLinkEMeterDevice
+from .emeter_device import TPLinkEMeterDevice
 from .device_type import TPLinkDeviceType
 from .hs100 import HS100SysInfo
 

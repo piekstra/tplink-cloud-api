@@ -1,4 +1,4 @@
-from tplinkcloud.device import TPLinkDevice
+from .device import TPLinkDevice
 from .device_type import TPLinkDeviceType
 
 
