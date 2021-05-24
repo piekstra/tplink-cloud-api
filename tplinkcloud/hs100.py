@@ -1,5 +1,5 @@
+from .device import TPLinkDevice
 from .device_type import TPLinkDeviceType
-from .emeter_device import TPLinkEMeterDevice
 
 
 class HS100Action:
@@ -35,7 +35,7 @@ class HS100SysInfo:
         self.longitude = sys_info.get('longitude')
 
 
-class HS100(TPLinkEMeterDevice):
+class HS100(TPLinkDevice):
 
     def __init__(self, client, device_id, device_info):
         super().__init__(client, device_id, device_info)
