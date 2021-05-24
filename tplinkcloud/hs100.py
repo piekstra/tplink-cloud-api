@@ -1,6 +1,5 @@
 from tplinkcloud.device import TPLinkDevice
 from .device_type import TPLinkDeviceType
-from .emeter_device import TPLinkEMeterDevice
 
 
 class HS100Action:
