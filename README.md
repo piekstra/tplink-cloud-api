@@ -86,7 +86,7 @@ else:
 
 Replace `My Smart Plug` with the alias you gave to your plug in the Kasa app (be sure to give a different alias to each device). Instead of `toggle()`, you can also use `power_on()` or `power_off()`.
 
-To retrieve power consumption data for one of the individual plugs on the power strip:
+To retrieve power consumption data for one of the individual plugs on an HS300 power strip (KP303 does not support power usage data):
 
 ```python
 import json
@@ -107,7 +107,7 @@ if devices:
 
 ### Smart Plugs (Not Power Strips) (HS100, HS103, HS105, HS110, KP115)
 
-These have the same functionality as the Smart Power Strips, though the HS103 and HS105 do not have the power usage features.
+These have the same functionality as the Smart Power Strips, though the HS100, HS103 and HS105 do not have the power usage features.
 
 ## Add and modify schedule rules for your devices
 
@@ -170,6 +170,7 @@ if device:
   device.delete_schedule_rule(rule.id)
 else:  
   print(f'Could not find {device_name}')
+```
 
 ## Testing
 
