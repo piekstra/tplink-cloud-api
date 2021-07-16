@@ -172,6 +172,31 @@ else:
   print(f'Could not find {device_name}')
 ```
 
+## Jupyter Notebooks
+
+After this library was updated to make use of `asyncio` to speed up requests by leveraging Python coroutines - especially important when you have a lot of Kasa devices associated with your account - an incompatibility with Jupyter Notebooks was introduced. 
+
+Jupyter Notebooks running Python 3 do not allow `asyncio.run` to be called, because the notebook already has an asyncio event loop running and according to the [docs](https://docs.python.org/3.9/library/asyncio-task.html#asyncio.run):
+> This function cannot be called when another asyncio event loop is running in the same thread.
+
+To get around this, the simplest thing to do is to create a new thread for any methods that you need to run where `asyncio.run` is called. For example:
+
+```python
+import threading
+from tplinkcloud import TPLinkDeviceManager
+
+username = 'REDACTED'
+password = 'REDACTED'
+
+device_manager = TPLinkDeviceManager(username, password, verbose=True, prefetch=False)
+
+devices_thread = threading.Thread(target=device_manager.get_devices)
+devices_thread.start()
+devices = devices_thread.join()
+```
+
+> Note that the `prefetch` parameter is set to `False` - this is because the prefetch runs `get_devices` for you and caches the result so long as `cache_devices` is left as its default value of `True`. At the time of writing, `get_devices` uses `asyncio.run` and so from a Jupyter Notebook context, we need to disable the prefetch so we can instead run `get_devices` in a separate thread.
+
 ## Testing
 
 This project leverages `wiremock` to test the code to some extent. Note this will not protect the project from changes that TP-Link makes to their API, but instead verifies that the existing code functions consistently as written.
