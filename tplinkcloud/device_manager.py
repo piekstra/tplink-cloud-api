@@ -93,7 +93,8 @@ class TPLinkDeviceManager:
             return TPLinkDevice(client, tplink_device_info.device_id, tplink_device_info)
 
     def login(self, username, password):
-        # We should only need to get this once
+        # Note that this token expires after some amount of time
+        # (Currently unkown what exactly that expiration time is)
         auth_token = self._tplink_api.login(username, password)
         self.set_auth_token(auth_token)
         return auth_token
