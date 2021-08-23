@@ -191,25 +191,14 @@ class TestFindDevices(object):
         assert devices is not None
         assert len(devices) == 2
 
+
 @pytest.mark.usefixtures('client')
 class TestAuth(object):
 
     def test_auth_no_username(self, client):
         with pytest.raises(ValueError):
-            TPLinkDeviceManager(
+            device_manager = TPLinkDeviceManager(
                 username=None,
-                password=os.environ.get('TPLINK_KASA_PASSWORD'),
-                prefetch=False,
-                cache_devices=False,
-                tplink_cloud_api_host=os.environ.get('TPLINK_KASA_API_URL'),
-                verbose=False,
-                term_id=os.environ.get('TPLINK_KASA_TERM_ID')
-            )
-
-    def test_auth_no_password(self, client):
-        with pytest.raises(ValueError):
-            TPLinkDeviceManager(
-                username=os.environ.get('TPLINK_KASA_USERNAME'),
                 password=None,
                 prefetch=False,
                 cache_devices=False,
@@ -217,3 +206,17 @@ class TestAuth(object):
                 verbose=False,
                 term_id=os.environ.get('TPLINK_KASA_TERM_ID')
             )
+            device_manager.login(None, os.environ.get('TPLINK_KASA_PASSWORD'))
+
+    def test_auth_no_password(self, client):
+        with pytest.raises(ValueError):
+            device_manager = TPLinkDeviceManager(
+                username=None,
+                password=None,
+                prefetch=False,
+                cache_devices=False,
+                tplink_cloud_api_host=os.environ.get('TPLINK_KASA_API_URL'),
+                verbose=False,
+                term_id=os.environ.get('TPLINK_KASA_TERM_ID')
+            )
+            device_manager.login(os.environ.get('TPLINK_KASA_USERNAME'), None)
