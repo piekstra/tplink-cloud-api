@@ -195,6 +195,19 @@ class TestFindDevices(object):
 @pytest.mark.usefixtures('client')
 class TestAuth(object):
 
+    def test_auth_no_username_or_password(self, client):
+        # Should not see an exception raised
+        device_manager = TPLinkDeviceManager(
+            username=None,
+            password=None,
+            prefetch=False,
+            cache_devices=False,
+            tplink_cloud_api_host=os.environ.get('TPLINK_KASA_API_URL'),
+            verbose=False,
+            term_id=os.environ.get('TPLINK_KASA_TERM_ID')
+        )
+        assert device_manager is not None
+
     def test_auth_no_username(self, client):
         with pytest.raises(ValueError):
             device_manager = TPLinkDeviceManager(
