@@ -100,6 +100,7 @@ class TPLinkDeviceManager:
         return auth_token
 
     def set_auth_token(self, auth_token):
+        # this token is used for all requests to the TP-Link API
         self._auth_token = auth_token
 
     def get_devices(self):
