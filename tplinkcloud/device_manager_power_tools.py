@@ -1,4 +1,4 @@
-import asyncio
+from asyncio import asyncio_run
 from datetime import datetime
 
 
@@ -34,15 +34,15 @@ class TPLinkDeviceManagerPowerTools:
 
     def get_devices_power_usage_realtime(self, devices_like):
         devices = self.get_emeter_devices(devices_like)
-        return asyncio.run(self._get_power_usage_realtime_async(devices))
+        return asyncio_run(self._get_power_usage_realtime_async, devices)
 
     def get_devices_power_usage_day(self, devices_like):
         devices = self.get_emeter_devices(devices_like)
-        return asyncio.run(self._get_power_usage_day_async(devices))
+        return asyncio_run(self._get_power_usage_day_async, devices)
 
     def get_devices_power_usage_month(self, devices_like):
         devices = self.get_emeter_devices(devices_like)
-        return asyncio.run(self._get_power_usage_month_async(devices))
+        return asyncio_run(self._get_power_usage_month_async, devices)
 
     async def _get_device_power_usage_realtime_async(self, device):
         usage = await device.get_power_usage_realtime_async()
