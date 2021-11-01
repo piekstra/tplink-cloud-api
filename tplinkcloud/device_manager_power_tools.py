@@ -1,4 +1,4 @@
-from asyncio import asyncio_run
+from .asyncio import asyncio_run
 from datetime import datetime
 
 
