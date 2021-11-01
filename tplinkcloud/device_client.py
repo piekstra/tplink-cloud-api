@@ -53,7 +53,7 @@ class TPLinkDeviceClient:
                     raise Exception(str(response.status) + ': ' + response.reason)
     
     def _request_post(self, body):
-        return asyncio_run(self._request_post_async, body)
+        return asyncio_run(self._request_post_async, [body])
 
     async def pass_through_request_async(self, device_id, request_data):
         body = {
@@ -70,4 +70,4 @@ class TPLinkDeviceClient:
         return None
 
     def pass_through_request(self, device_id, request_data):
-        return asyncio_run(self.pass_through_request_async, device_id, request_data)
+        return asyncio_run(self.pass_through_request_async, [device_id, request_data])
