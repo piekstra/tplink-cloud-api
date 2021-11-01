@@ -17,8 +17,8 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     install_requires=[
-        'requests==2.25.1',
-        'aiohttp==3.7.4'
+        'requests>=2,<3',
+        'aiohttp>=3,<4'
     ],
     url='https://github.com/piekstra/tplink-cloud-api',
     python_requires='>=3.7',
