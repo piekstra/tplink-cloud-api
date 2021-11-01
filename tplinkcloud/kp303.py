@@ -1,5 +1,4 @@
-import asyncio
-
+from .asyncio import asyncio_run
 from .device_type import TPLinkDeviceType
 from .device import TPLinkDevice
 from .kp303_child import KP303Child, KP303ChildSysInfo
@@ -60,4 +59,4 @@ class KP303(TPLinkDevice):
         return KP303SysInfo(sys_info)
         
     def get_sys_info(self):
-        return asyncio.run(self.get_sys_info_async())
+        return asyncio_run(self.get_sys_info_async)
