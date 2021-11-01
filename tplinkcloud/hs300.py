@@ -1,5 +1,4 @@
-import asyncio
-
+from .asyncio import asyncio_run
 from .device_type import TPLinkDeviceType
 from .device import TPLinkDevice
 from .hs300_child import HS300Child, HS300ChildSysInfo
@@ -60,4 +59,4 @@ class HS300(TPLinkDevice):
         return HS300SysInfo(sys_info)
     
     def get_sys_info(self):
-        return asyncio.run(self.get_sys_info_async())
+        return asyncio_run(self.get_sys_info_async)
