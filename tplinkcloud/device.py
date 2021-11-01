@@ -1,5 +1,4 @@
-import asyncio
-
+from .asyncio import asyncio_run
 from .device_type import TPLinkDeviceType
 from .device_net_info import DeviceNetInfo
 from .device_time import DeviceTime
@@ -43,7 +42,7 @@ class TPLinkDevice:
 
     # This may be overriden for devices that have children
     def get_children(self):
-        return asyncio.run(self.get_children_async())
+        return asyncio_run(self.get_children_async)
 
     # This is expected to be overriden for emeter devices
     def has_emeter(self):
@@ -78,7 +77,7 @@ class TPLinkDevice:
         return sub_request_response
 
     def _pass_through_request(self, request_type, sub_request_type, request):
-        return asyncio.run(self._pass_through_request_async(request_type, sub_request_type, request))
+        return asyncio_run(self._pass_through_request_async, request_type, sub_request_type, request)
 
     def power_on(self):
         return self._pass_through_request('system', 'set_relay_state', {'state': 1})
@@ -96,7 +95,7 @@ class TPLinkDevice:
         return await self._pass_through_request_async('system', 'get_sysinfo', None)
 
     def _get_sys_info(self):
-        return asyncio.run(self._get_sys_info_async())
+        return asyncio_run(self._get_sys_info_async)
 
     # This is intended to be overriden by actual device
     # implementations where sys info is well-defined
