@@ -77,7 +77,7 @@ class TPLinkDevice:
         return sub_request_response
 
     def _pass_through_request(self, request_type, sub_request_type, request):
-        return asyncio_run(self._pass_through_request_async, request_type, sub_request_type, request)
+        return asyncio_run(self._pass_through_request_async, [request_type, sub_request_type, request])
 
     def power_on(self):
         return self._pass_through_request('system', 'set_relay_state', {'state': 1})
