@@ -51,7 +51,7 @@ class TPLinkEMeterDevice(TPLinkDevice):
         return None
 
     def get_power_usage_day(self, year, month):
-        return asyncio_run(self.get_power_usage_day_async, year, month)
+        return asyncio_run(self.get_power_usage_day_async, [year, month])
 
     async def get_power_usage_day_async(self, year, month):
         day_response_data = await self._pass_through_request_async(
@@ -68,7 +68,7 @@ class TPLinkEMeterDevice(TPLinkDevice):
         return []
 
     def get_power_usage_month(self, year):
-        return asyncio_run(self.get_power_usage_month_async, year)
+        return asyncio_run(self.get_power_usage_month_async, [year])
 
     async def get_power_usage_month_async(self, year):
         month_response_data = await self._pass_through_request_async(
