@@ -1,3 +1,5 @@
+import asyncio
+
 from .asyncio import asyncio_run
 from .device_info import TPLinkDeviceInfo
 from .device_client import TPLinkDeviceClient
