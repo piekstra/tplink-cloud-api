@@ -1,5 +1,4 @@
-import asyncio
-
+from .asyncio import asyncio_run
 from .device_info import TPLinkDeviceInfo
 from .device_client import TPLinkDeviceClient
 from .client import TPLinkApi
@@ -105,7 +104,7 @@ class TPLinkDeviceManager:
         self._auth_token = auth_token
 
     def get_devices(self):
-        return asyncio.run(self._fetch_devices())
+        return asyncio_run(self._fetch_devices)
 
     def find_device(self, device_name):
         devices = self.get_devices()
