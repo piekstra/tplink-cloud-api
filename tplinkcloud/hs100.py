@@ -41,8 +41,8 @@ class HS100(TPLinkDevice):
         super().__init__(client, device_id, device_info)
         self.model_type = TPLinkDeviceType.HS100
 
-    def get_sys_info(self):
-        sys_info = self._get_sys_info()
+    async def get_sys_info(self):
+        sys_info = await self._get_sys_info()
         
         if not sys_info:
             print("Something went wrong with your request; please try again")

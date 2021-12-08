@@ -5,8 +5,8 @@ from tplinkcloud import TPLinkDeviceManager
 
 
 @pytest.fixture(scope='module')
-def client():
-    return TPLinkDeviceManager(
+async def client():
+    return await TPLinkDeviceManager(
         username=os.environ.get('TPLINK_KASA_USERNAME'),
         password=os.environ.get('TPLINK_KASA_PASSWORD'),
         prefetch=False,
@@ -20,10 +20,11 @@ def client():
 @pytest.mark.usefixtures('client')
 class TestHS103USDevice(object):
 
-    def test_get_sys_info_gets_info(self, client):
+    @pytest.mark.asyncio
+    async def test_get_sys_info_gets_info(self, client):
         device_name = 'Bedroom Desk Light'
-        device = client.find_device(device_name)
-        sys_info = device.get_sys_info()
+        device = await client.find_device(device_name)
+        sys_info = await device.get_sys_info()
 
         assert sys_info is not None
         assert sys_info.sw_ver == '1.1.3 Build 200804 Rel.095135'
@@ -51,9 +52,10 @@ class TestHS103USDevice(object):
         assert sys_info.next_action.action == -1
         assert sys_info.err_code == 0
 
-    def test_has_emeter_returns_false(self, client):
+    @pytest.mark.asyncio
+    async def test_has_emeter_returns_false(self, client):
         device_name = 'Bedroom Desk Light'
-        device = client.find_device(device_name)
+        device = await client.find_device(device_name)
         has_emeter = device.has_emeter()
 
         assert has_emeter is not None

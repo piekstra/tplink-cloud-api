@@ -5,8 +5,8 @@ from tplinkcloud import TPLinkDeviceManager
 
 
 @pytest.fixture(scope='module')
-def client():
-    return TPLinkDeviceManager(
+async def client():
+    return await TPLinkDeviceManager(
         username=os.environ.get('TPLINK_KASA_USERNAME'),
         password=os.environ.get('TPLINK_KASA_PASSWORD'),
         prefetch=False,
@@ -20,11 +20,12 @@ def client():
 @pytest.mark.usefixtures('client')
 class TestHS300USDevice(object):
 
-    def test_get_sys_info_gets_info(self, client):
+    @pytest.mark.asyncio
+    async def test_get_sys_info_gets_info(self, client):
         device_name = 'TP-LINK_Power Strip_9704'
-        device = client.find_device(device_name)
+        device = await client.find_device(device_name)
         print(device.get_alias())
-        sys_info = device.get_sys_info()
+        sys_info = await device.get_sys_info()
 
         assert sys_info is not None
         assert sys_info.sw_ver == '1.0.19 Build 200224 Rel.090814'
@@ -97,17 +98,19 @@ class TestHS300USDevice(object):
         assert sys_info.children[5].next_action.schd_sec is None
         assert sys_info.children[5].next_action.action is None
 
-    def test_has_emeter_returns_false_for_parent(self, client):
+    @pytest.mark.asyncio
+    async def test_has_emeter_returns_false_for_parent(self, client):
         device_name = 'TP-LINK_Power Strip_9704'
-        parent_device = client.find_device(device_name)
+        parent_device = await client.find_device(device_name)
         has_emeter = parent_device.has_emeter()
 
         assert has_emeter is not None
         assert has_emeter == False
 
-    def test_has_emeter_returns_true_for_child(self, client):
+    @pytest.mark.asyncio
+    async def test_has_emeter_returns_true_for_child(self, client):
         device_name = 'Plug 6'
-        child_device = client.find_device(device_name)
+        child_device = await client.find_device(device_name)
         has_emeter = child_device.has_emeter()
 
         assert has_emeter is not None
