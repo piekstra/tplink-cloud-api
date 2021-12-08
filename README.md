@@ -53,7 +53,7 @@ from tplinkcloud import TPLinkDeviceManager
 username='kasa@email.com'
 password='secure'
 
-device_manager = TPLinkDeviceManager(username, password)
+device_manager = await TPLinkDeviceManager(username, password)
 ```
 
 ## Retrieve devices
@@ -61,7 +61,7 @@ device_manager = TPLinkDeviceManager(username, password)
 To view your devices, you can run the following:
 
 ```python
-devices = device_manager.get_devices()
+devices = await device_manager.get_devices()
 if devices:
   print(f'Found {len(devices)} devices')
   for device in devices:
@@ -76,7 +76,7 @@ Toggle a plug:
 
 ```python
 device_name = "My Smart Plug"
-device = device_manager.find_device(device_name)
+device = await device_manager.find_device(device_name)
 if device:
   print(f'Found {device.model_type.name} device: {device.get_alias()}')
   device.toggle()
@@ -90,7 +90,8 @@ To retrieve power consumption data for one of the individual plugs on an HS300 p
 
 ```python
 import json
-power_usage = device_manager.find_device("My Smart Plug").get_power_usage()
+device = await device_manager.find_device("My Smart Plug")
+power_usage = await device.get_power_usage_realtime()
 print(json.dumps(power_usage, indent=2, default=lambda x: x.__dict__))
 ```
 
@@ -98,7 +99,7 @@ If you want to get multiple devices with a name including a certain substring, y
 
 ```python
 device_names_like = "plug"
-devices = device_manager.find_devices(device_names_like)
+devices = await device_manager.find_devices(device_names_like)
 if devices:
   print(f'Found {len(devices)} matching devices')
   for device in devices:
@@ -116,11 +117,11 @@ Edit an existing schedule rule
 ```python
 from tplinkcloud import TPLinkDeviceManager, TPLinkDeviceScheduleRuleBuilder
 device_name = "My Smart Plug"
-device = device_manager.find_device(device_name)
+device = await device_manager.find_device(device_name)
 if device:
   print(f'Found {device.model_type.name} device: {device.get_alias()}')
   print(f'Modifying schedule rule')
-  schedule = device.get_schedule_rules()
+  schedule = await device.get_schedule_rules()
   original_rule = schedule.rules[0]
   rule_edit = TPLinkDeviceScheduleRuleBuilder(
     original_rule
@@ -137,7 +138,7 @@ Add a new schedule rule
 ```python
 from tplinkcloud import TPLinkDeviceManager, TPLinkDeviceScheduleRuleBuilder
 device_name = "My Smart Plug"
-device = device_manager.find_device(device_name)
+device = await device_manager.find_device(device_name)
 if device:
   print(f'Found {device.model_type.name} device: {device.get_alias()}')
   print(f'Adding schedule rule')
@@ -161,7 +162,7 @@ Delete a schedule rule
 ```python
 from tplinkcloud import TPLinkDeviceManager, TPLinkDeviceScheduleRuleBuilder
 device_name = "My Smart Plug"
-device = device_manager.find_device(device_name)
+device = await device_manager.find_device(device_name)
 if device:
   print(f'Found {device.model_type.name} device: {device.get_alias()}')
   print(f'Deleting schedule rule')
@@ -171,31 +172,6 @@ if device:
 else:  
   print(f'Could not find {device_name}')
 ```
-
-## Jupyter Notebooks
-
-After this library was updated to make use of `asyncio` to speed up requests by leveraging Python coroutines - especially important when you have a lot of Kasa devices associated with your account - an incompatibility with Jupyter Notebooks was introduced. 
-
-Jupyter Notebooks running Python 3 do not allow `asyncio.run` to be called, because the notebook already has an asyncio event loop running and according to the [docs](https://docs.python.org/3.9/library/asyncio-task.html#asyncio.run):
-> This function cannot be called when another asyncio event loop is running in the same thread.
-
-To get around this, the simplest thing to do is to create a new thread for any methods that you need to run where `asyncio.run` is called. For example:
-
-```python
-import threading
-from tplinkcloud import TPLinkDeviceManager
-
-username = 'REDACTED'
-password = 'REDACTED'
-
-device_manager = TPLinkDeviceManager(username, password, verbose=True, prefetch=False)
-
-devices_thread = threading.Thread(target=device_manager.get_devices)
-devices_thread.start()
-devices = devices_thread.join()
-```
-
-> Note that the `prefetch` parameter is set to `False` - this is because the prefetch runs `get_devices` for you and caches the result so long as `cache_devices` is left as its default value of `True`. At the time of writing, `get_devices` uses `asyncio.run` and so from a Jupyter Notebook context, we need to disable the prefetch so we can instead run `get_devices` in a separate thread.
 
 ## Testing
 
