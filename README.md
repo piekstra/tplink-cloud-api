@@ -53,7 +53,40 @@ from tplinkcloud import TPLinkDeviceManager
 username='kasa@email.com'
 password='secure'
 
-device_manager = await TPLinkDeviceManager(username, password)
+device_manager = TPLinkDeviceManager(username, password)
+```
+
+> Note that the device manager can also be constructed using `await` if desired and running in an `async` context
+
+## Async Context
+
+In order to run the async methods, you will need an async context. For a simple Python script, an easy way to do this can be found in the following example which can fetch a large number of devices' system info very quickly:
+
+```python
+from tplinkcloud import TPLinkDeviceManager
+
+import asyncio
+import json
+
+username = 'kasa@email.com'
+password = 'secure'
+device_manager = TPLinkDeviceManager(username, password)
+
+async def fetch_all_devices_sys_info():
+  devices = await device_manager.get_devices()
+  fetch_tasks = []
+  for device in devices:
+    async def get_info(device):
+      print(f'Found {device.model_type.name} device: {device.get_alias()}')
+      print("SYS INFO")
+      print(json.dumps(device.device_info, indent=2, default=lambda x: vars(x)
+                        if hasattr(x, "__dict__") else x.name if hasattr(x, "name") else None))
+      print(json.dumps(await device.get_sys_info(), indent=2, default=lambda x: vars(x)
+                        if hasattr(x, "__dict__") else x.name if hasattr(x, "name") else None))
+    tasks.append(get_info(device))
+  await asyncio.gather(*fetch_tasks)
+
+asyncio.run(fetch_all_devices_sys_info())
 ```
 
 ## Retrieve devices
@@ -79,7 +112,7 @@ device_name = "My Smart Plug"
 device = await device_manager.find_device(device_name)
 if device:
   print(f'Found {device.model_type.name} device: {device.get_alias()}')
-  device.toggle()
+  await device.toggle()
 else:  
   print(f'Could not find {device_name}')
 ```
@@ -115,7 +148,6 @@ These have the same functionality as the Smart Power Strips, though the HS100, H
 Edit an existing schedule rule
 
 ```python
-from tplinkcloud import TPLinkDeviceManager, TPLinkDeviceScheduleRuleBuilder
 device_name = "My Smart Plug"
 device = await device_manager.find_device(device_name)
 if device:
@@ -128,7 +160,7 @@ if device:
   ).with_enable_status(
       False
   )
-  device.edit_schedule_rule(rule_edit.to_json())
+  await device.edit_schedule_rule(rule_edit.to_json())
 else:  
   print(f'Could not find {device_name}')
 ```
@@ -136,7 +168,6 @@ else:
 Add a new schedule rule
 
 ```python
-from tplinkcloud import TPLinkDeviceManager, TPLinkDeviceScheduleRuleBuilder
 device_name = "My Smart Plug"
 device = await device_manager.find_device(device_name)
 if device:
@@ -152,7 +183,7 @@ if device:
   ).with_sunset_start().with_repeat_on_days(
       [0, 0, 0, 0, 0, 1, 1]
   ).build()
-  device.add_schedule_rule(new_rule.to_json())
+  await device.add_schedule_rule(new_rule.to_json())
 else:  
   print(f'Could not find {device_name}')
 ```
@@ -160,15 +191,14 @@ else:
 Delete a schedule rule
 
 ```python
-from tplinkcloud import TPLinkDeviceManager, TPLinkDeviceScheduleRuleBuilder
 device_name = "My Smart Plug"
 device = await device_manager.find_device(device_name)
 if device:
   print(f'Found {device.model_type.name} device: {device.get_alias()}')
   print(f'Deleting schedule rule')
-  schedule = device.get_schedule_rules()
+  schedule = await device.get_schedule_rules()
   rule = schedule.rules[0]
-  device.delete_schedule_rule(rule.id)
+  await device.delete_schedule_rule(rule.id)
 else:  
   print(f'Could not find {device_name}')
 ```
