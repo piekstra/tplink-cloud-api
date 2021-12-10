@@ -60,7 +60,15 @@ device_manager = TPLinkDeviceManager(username, password)
 
 ## Async Context
 
-In order to run the async methods, you will need an async context. For a simple Python script, an easy way to do this can be found in the following example which can fetch a large number of devices' system info very quickly:
+In order to run the async methods, you will need an async context. For a simple Python script, you can simply use the following:
+
+```python
+import asyncio
+
+asyncio.run(example_async_method())
+```
+
+For more advanced usage, you can gather tasks so they all run at once such as in the following example which can fetch a large number of devices' system info very quickly:
 
 ```python
 from tplinkcloud import TPLinkDeviceManager
