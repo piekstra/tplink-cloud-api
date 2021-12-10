@@ -34,13 +34,21 @@ class TPLinkDeviceManager:
 
         self._tplink_api = TPLinkApi(
             tplink_cloud_api_host, verbose=self._verbose, term_id=self._term_id)
+
         if username and password:
             self.login(username, password)
-        # Fetch the devices up front if prefetch and cache them if caching
-        if prefetch and self._cache_devices and self._auth_token:
-            self.get_devices()
+        self._prefetch = prefetch
 
-    async def _fetch_devices(self):
+    async def async_init(self):
+        # Fetch the devices up front if prefetch and cache them if caching
+        if self._prefetch and self._cache_devices and self._auth_token:
+            await self.get_devices()
+        return self
+
+    def __await__(self):
+        return self.async_init().__await__()
+
+    async def get_devices(self):
         if self._cached_devices:
             return self._cached_devices
 
@@ -104,11 +112,8 @@ class TPLinkDeviceManager:
         # where authentication is required
         self._auth_token = auth_token
 
-    def get_devices(self):
-        return asyncio.run(self._fetch_devices())
-
-    def find_device(self, device_name):
-        devices = self.get_devices()
+    async def find_device(self, device_name):
+        devices = await self.get_devices()
         # Just return the first match
         for device in devices:
             if device.get_alias() == device_name:
@@ -116,8 +121,8 @@ class TPLinkDeviceManager:
 
         return None
 
-    def find_devices(self, device_names_like):
-        devices = self.get_devices()
+    async def find_devices(self, device_names_like):
+        devices = await self.get_devices()
         matching_devices = []
         for device in devices:
             if device_names_like.lower() in device.get_alias().lower():

@@ -5,8 +5,8 @@ from freezegun import freeze_time
 from tplinkcloud import TPLinkDeviceManager, TPLinkDeviceManagerPowerTools
 
 @pytest.fixture(scope='module')
-def power_tools():
-    client = TPLinkDeviceManager(
+async def power_tools():
+    client = await TPLinkDeviceManager(
         username=os.environ.get('TPLINK_KASA_USERNAME'),
         password=os.environ.get('TPLINK_KASA_PASSWORD'),
         tplink_cloud_api_host=os.environ.get('TPLINK_KASA_API_URL'),
@@ -20,23 +20,26 @@ def power_tools():
 @pytest.mark.usefixtures('power_tools')
 class TestDeviceManagerPowerTools(object):
 
-    def test_get_emeter_devices_gets_emeter_devices(self, power_tools):
-        emeter_device_list = power_tools.get_emeter_devices()
+    @pytest.mark.asyncio
+    async def test_get_emeter_devices_gets_emeter_devices(self, power_tools):
+        emeter_device_list = await power_tools.get_emeter_devices()
 
         assert emeter_device_list is not None
         # 1 device plus the 6 emeter devices (children) associated with another
         assert len(emeter_device_list) == 7
 
-    def test_get_emeter_devices_gets_emeter_devices_with_substring(self, power_tools):
+    @pytest.mark.asyncio
+    async def test_get_emeter_devices_gets_emeter_devices_with_substring(self, power_tools):
         devices_like = 'light'
-        matching_emeter_devices = power_tools.get_emeter_devices(devices_like)
+        matching_emeter_devices = await power_tools.get_emeter_devices(devices_like)
 
         assert matching_emeter_devices is not None
         assert len(matching_emeter_devices) == 1
 
-    def test_get_devices_power_usage_realtime_gets_usage(self, power_tools):
+    @pytest.mark.asyncio
+    async def test_get_devices_power_usage_realtime_gets_usage(self, power_tools):
         devices_like = 'plug'
-        usage = power_tools.get_devices_power_usage_realtime(devices_like)
+        usage = await power_tools.get_devices_power_usage_realtime(devices_like)
 
         child_id_iter = iter([
             '5BFA53B31294DDA5AB4DEBA1B62582E8EC2F789E00',
@@ -58,10 +61,11 @@ class TestDeviceManagerPowerTools(object):
             assert device_usage.data.total_wh > 0
             assert device_usage.data.voltage_mv > 0
 
+    @pytest.mark.asyncio
     @freeze_time("2021-04-09")
-    def test_get_devices_power_usage_day_gets_usage(self, power_tools):        
+    async def test_get_devices_power_usage_day_gets_usage(self, power_tools):        
         devices_like = 'plug'
-        usage = power_tools.get_devices_power_usage_day(devices_like)
+        usage = await power_tools.get_devices_power_usage_day(devices_like)
         
         child_id_iter = iter([
             '5BFA53B31294DDA5AB4DEBA1B62582E8EC2F789E00',
@@ -91,10 +95,11 @@ class TestDeviceManagerPowerTools(object):
                 assert data_item.month == month
                 assert data_item.year == 2021
 
+    @pytest.mark.asyncio
     @freeze_time("2021-04-09")
-    def test_get_devices_power_usage_month_gets_usage(self, power_tools):
+    async def test_get_devices_power_usage_month_gets_usage(self, power_tools):
         devices_like = 'plug'
-        usage = power_tools.get_devices_power_usage_month(devices_like)
+        usage = await power_tools.get_devices_power_usage_month(devices_like)
         
         child_id_iter = iter([
             '5BFA53B31294DDA5AB4DEBA1B62582E8EC2F789E00',

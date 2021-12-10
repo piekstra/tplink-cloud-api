@@ -24,28 +24,28 @@ class TPLinkDeviceManagerPowerTools:
     ):
         self._device_manager = device_manager
     
-    def get_emeter_devices(self, devices_like=None):
+    async def get_emeter_devices(self, devices_like=None):
         if devices_like:
-            devices = self._device_manager.find_devices(devices_like)
+            devices = await self._device_manager.find_devices(devices_like)
         else:
-            devices = self._device_manager.get_devices()
+            devices = await self._device_manager.get_devices()
         emeter_devices = [device for device in devices if device.has_emeter()]
         return emeter_devices
 
-    def get_devices_power_usage_realtime(self, devices_like):
-        devices = self.get_emeter_devices(devices_like)
-        return asyncio.run(self._get_power_usage_realtime_async(devices))
+    async def get_devices_power_usage_realtime(self, devices_like):
+        devices = await self.get_emeter_devices(devices_like)
+        return await self._get_power_usage_realtime(devices)
 
-    def get_devices_power_usage_day(self, devices_like):
-        devices = self.get_emeter_devices(devices_like)
-        return asyncio.run(self._get_power_usage_day_async(devices))
+    async def get_devices_power_usage_day(self, devices_like):
+        devices = await self.get_emeter_devices(devices_like)
+        return await self._get_power_usage_day(devices)
 
-    def get_devices_power_usage_month(self, devices_like):
-        devices = self.get_emeter_devices(devices_like)
-        return asyncio.run(self._get_power_usage_month_async(devices))
+    async def get_devices_power_usage_month(self, devices_like):
+        devices = await self.get_emeter_devices(devices_like)
+        return await self._get_power_usage_month(devices)
 
-    async def _get_device_power_usage_realtime_async(self, device):
-        usage = await device.get_power_usage_realtime_async()
+    async def _get_device_power_usage_realtime(self, device):
+        usage = await device.get_power_usage_realtime()
 
         return DevicePowerUsage(
             device.device_id,
@@ -54,19 +54,19 @@ class TPLinkDeviceManagerPowerTools:
             usage
         )
 
-    async def _get_power_usage_realtime_async(self, devices):
+    async def _get_power_usage_realtime(self, devices):
         device_usage_requests = []
         for device in devices:
-            device_usage_requests.append(self._get_device_power_usage_realtime_async(
+            device_usage_requests.append(self._get_device_power_usage_realtime(
                 device
             ))
 
         device_usage = await asyncio.gather(*device_usage_requests)
         return device_usage
 
-    async def _get_device_power_usage_day_async(self, device, today, previous_month, previous_months_year):
-        usage = await device.get_power_usage_day_async(today.year, today.month)
-        previous_month_usage = await device.get_power_usage_day_async(previous_months_year, previous_month)
+    async def _get_device_power_usage_day(self, device, today, previous_month, previous_months_year):
+        usage = await device.get_power_usage_day(today.year, today.month)
+        previous_month_usage = await device.get_power_usage_day(previous_months_year, previous_month)
         if previous_month_usage:
             usage.extend(previous_month_usage)
         usage.sort(key=lambda x: datetime(year=x.year, month=x.month, day=x.day))
@@ -78,7 +78,7 @@ class TPLinkDeviceManagerPowerTools:
             usage
         )
 
-    async def _get_power_usage_day_async(self, devices):
+    async def _get_power_usage_day(self, devices):
         today = datetime.today()
         # Data requested by month needs to account for the past month
         if today.month > 1:
@@ -90,7 +90,7 @@ class TPLinkDeviceManagerPowerTools:
 
         device_usage_requests = []
         for device in devices:
-            device_usage_requests.append(self._get_device_power_usage_day_async(
+            device_usage_requests.append(self._get_device_power_usage_day(
                 device,
                 today,
                 previous_month,
@@ -100,9 +100,9 @@ class TPLinkDeviceManagerPowerTools:
         device_usage = await asyncio.gather(*device_usage_requests)
         return device_usage
 
-    async def _get_device_power_usage_month_async(self, device, today):
-        usage = await device.get_power_usage_month_async(today.year)
-        previous_year_usage = await device.get_power_usage_month_async(today.year - 1)
+    async def _get_device_power_usage_month(self, device, today):
+        usage = await device.get_power_usage_month(today.year)
+        previous_year_usage = await device.get_power_usage_month(today.year - 1)
         if previous_year_usage:
             usage.extend(previous_year_usage)
         # Given there is no actual day data, just use the same value for each
@@ -115,11 +115,11 @@ class TPLinkDeviceManagerPowerTools:
             usage
         )
 
-    async def _get_power_usage_month_async(self, devices):
+    async def _get_power_usage_month(self, devices):
         today = datetime.today()
         device_usage_requests = []
         for device in devices:
-            device_usage_requests.append(self._get_device_power_usage_month_async(
+            device_usage_requests.append(self._get_device_power_usage_month(
                 device, 
                 today
             ))

@@ -1,12 +1,13 @@
 import os
 import pytest
+import asyncio
 
 from tplinkcloud import TPLinkDeviceManager
 
 
 @pytest.fixture(scope='module')
-def client():
-    return TPLinkDeviceManager(
+async def client():
+    return await TPLinkDeviceManager(
         username=os.environ.get('TPLINK_KASA_USERNAME'),
         password=os.environ.get('TPLINK_KASA_PASSWORD'),
         prefetch=False,
@@ -17,23 +18,24 @@ def client():
     )
 
 
-@pytest.mark.usefixtures('client')
+@pytest.mark.usefixtures('client', 'event_loop')
 class TestGetDevices(object):
 
-    def test_gets_devices(self, client):
-        device_list = client.get_devices()
+    @pytest.mark.asyncio
+    async def test_gets_devices(self, client):
+        device_list = await client.get_devices()
         assert device_list is not None
         # 5 devices but the 5th one has 6 children
         assert len(device_list) == 11
 
-
 @pytest.mark.usefixtures('client')
 class TestFindDevice(object):
 
-    def test_finds_hs103_us_device(self, client):
+    @pytest.mark.asyncio
+    async def test_finds_hs103_us_device(self, client):
         device_name = 'Bedroom Desk Light'
         device_id = '2F50687F0187798768F86EAE340E844A660B2444'
-        device = client.find_device(device_name)
+        device = await client.find_device(device_name)
 
         assert device is not None
         assert device.get_alias() == device_name
@@ -60,10 +62,11 @@ class TestFindDevice(object):
         assert device.model_type is not None
         assert device.model_type.name == 'HS103'
 
-    def test_finds_hs105_us_device(self, client):
+    @pytest.mark.asyncio
+    async def test_finds_hs105_us_device(self, client):
         device_name = 'Left Lamp'
         device_id = '9F231AD114D92FE98DEB7843ADC91D0EEEF2D0B8'
-        device = client.find_device(device_name)
+        device = await client.find_device(device_name)
 
         assert device is not None
         assert device.get_alias() == device_name
@@ -90,10 +93,11 @@ class TestFindDevice(object):
         assert device.model_type is not None
         assert device.model_type.name == 'HS105'
 
-    def test_finds_hs110_us_device(self, client):
+    @pytest.mark.asyncio
+    async def test_finds_hs110_us_device(self, client):
         device_name = 'Bedroom Light'
         device_id = '6572495E336088D1DF4BD661CAB8A89862DF6603'
-        device = client.find_device(device_name)
+        device = await client.find_device(device_name)
 
         assert device is not None
         assert device.get_alias() == device_name
@@ -120,10 +124,11 @@ class TestFindDevice(object):
         assert device.model_type is not None
         assert device.model_type.name == 'HS110'
 
-    def test_finds_hs300_us_device(self, client):
+    @pytest.mark.asyncio
+    async def test_finds_hs300_us_device(self, client):
         device_name = 'TP-LINK_Power Strip_9704'
         device_id = '5BFA53B31294DDA5AB4DEBA1B62582E8EC2F789E'
-        device = client.find_device(device_name)
+        device = await client.find_device(device_name)
 
         assert device is not None
         assert device.get_alias() == device_name
@@ -150,10 +155,11 @@ class TestFindDevice(object):
         assert device.model_type is not None
         assert device.model_type.name == 'HS300'
 
-    def test_finds_unknown_us_device(self, client):
+    @pytest.mark.asyncio
+    async def test_finds_unknown_us_device(self, client):
         device_name = 'Test Strip'
         device_id = '140BED90F6EF82191649329403A40C66528411D2'
-        device = client.find_device(device_name)
+        device = await client.find_device(device_name)
 
         assert device is not None
         assert device.get_alias() == device_name
@@ -184,9 +190,10 @@ class TestFindDevice(object):
 @pytest.mark.usefixtures('client')
 class TestFindDevices(object):
 
-    def test_finds_multiple_devices(self, client):
+    @pytest.mark.asyncio
+    async def test_finds_multiple_devices(self, client):
         devices_like = 'bedroom'
-        devices = client.find_devices(devices_like)
+        devices = await client.find_devices(devices_like)
 
         assert devices is not None
         assert len(devices) == 2
@@ -195,9 +202,10 @@ class TestFindDevices(object):
 @pytest.mark.usefixtures('client')
 class TestAuth(object):
 
-    def test_auth_no_username_or_password(self, client):
+    @pytest.mark.asyncio
+    async def test_auth_no_username_or_password(self, client):
         # Should not see an exception raised
-        device_manager = TPLinkDeviceManager(
+        device_manager = await TPLinkDeviceManager(
             username=None,
             password=None,
             prefetch=False,
@@ -208,9 +216,10 @@ class TestAuth(object):
         )
         assert device_manager is not None
 
-    def test_auth_no_username(self, client):
+    @pytest.mark.asyncio
+    async def test_auth_no_username(self, client):
         with pytest.raises(ValueError):
-            device_manager = TPLinkDeviceManager(
+            device_manager = await TPLinkDeviceManager(
                 username=None,
                 password=None,
                 prefetch=False,
@@ -221,9 +230,10 @@ class TestAuth(object):
             )
             device_manager.login(None, os.environ.get('TPLINK_KASA_PASSWORD'))
 
-    def test_auth_no_password(self, client):
+    @pytest.mark.asyncio
+    async def test_auth_no_password(self, client):
         with pytest.raises(ValueError):
-            device_manager = TPLinkDeviceManager(
+            device_manager = await TPLinkDeviceManager(
                 username=None,
                 password=None,
                 prefetch=False,

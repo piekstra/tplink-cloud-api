@@ -3,10 +3,9 @@ import pytest
 
 from tplinkcloud import TPLinkDeviceManager
 
-
 @pytest.fixture(scope='module')
-def client():
-    return TPLinkDeviceManager(
+async def client():
+    return await TPLinkDeviceManager(
         username=os.environ.get('TPLINK_KASA_USERNAME'),
         password=os.environ.get('TPLINK_KASA_PASSWORD'),
         prefetch=False,
@@ -20,10 +19,11 @@ def client():
 @pytest.mark.usefixtures('client')
 class TestTPLinkDevice(object):
 
-    def test_get_net_info_gets_net_info(self, client):
+    @pytest.mark.asyncio
+    async def test_get_net_info_gets_net_info(self, client):
         device_name = 'Left Lamp'
-        device = client.find_device(device_name)
-        net_info = device.get_net_info()
+        device = await client.find_device(device_name)
+        net_info = await device.get_net_info()
 
         assert net_info is not None
         assert net_info.ssid == "My WiFi Network"
@@ -31,10 +31,11 @@ class TestTPLinkDevice(object):
         assert net_info.rssi == -39
         assert net_info.err_code == 0
 
-    def test_get_time_gets_time(self, client):
+    @pytest.mark.asyncio
+    async def test_get_time_gets_time(self, client):
         device_name = 'Left Lamp'
-        device = client.find_device(device_name)
-        time = device.get_time()
+        device = await client.find_device(device_name)
+        time = await device.get_time()
 
         assert time is not None
         assert time.year == 2021
@@ -45,10 +46,11 @@ class TestTPLinkDevice(object):
         assert time.sec == 41
         assert time.err_code == 0
 
-    def test_get_timezone_gets_timezone(self, client):
+    @pytest.mark.asyncio
+    async def test_get_timezone_gets_timezone(self, client):
         device_name = 'Left Lamp'
-        device = client.find_device(device_name)
-        timezone = device.get_timezone()
+        device = await client.find_device(device_name)
+        timezone = await device.get_timezone()
 
         assert timezone is not None
         assert timezone.index == 6
@@ -58,10 +60,11 @@ class TestTPLinkDevice(object):
 @pytest.mark.usefixtures('client')
 class TestTPLinkDeviceSchedule(object):
 
-    def test_get_schedule_rules_gets_schedule_rules(self, client):
+    @pytest.mark.asyncio
+    async def test_get_schedule_rules_gets_schedule_rules(self, client):
         device_name = 'Left Lamp'
-        device = client.find_device(device_name)
-        schedule = device.get_schedule_rules()
+        device = await client.find_device(device_name)
+        schedule = await device.get_schedule_rules()
 
         assert schedule is not None
         # Unsure what this field is for

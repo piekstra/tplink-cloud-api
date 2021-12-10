@@ -37,7 +37,7 @@ class HS300(TPLinkDevice):
         self.model_type = TPLinkDeviceType.HS300
 
     async def get_children_async(self):
-        sys_info = await self.get_sys_info_async()
+        sys_info = await self.get_sys_info()
         children = []
         if sys_info:
             for child_info in sys_info.children:
@@ -50,14 +50,11 @@ class HS300(TPLinkDevice):
     def has_children(self):
         return True
 
-    async def get_sys_info_async(self):
-        sys_info = await self._get_sys_info_async()
+    async def get_sys_info(self):
+        sys_info = await self._get_sys_info()
         
         if not sys_info:
             print("Something went wrong with your request; please try again")
             return None
         
         return HS300SysInfo(sys_info)
-    
-    def get_sys_info(self):
-        return asyncio.run(self.get_sys_info_async())
