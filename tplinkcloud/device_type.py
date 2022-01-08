@@ -9,6 +9,7 @@ class TPLinkDeviceType(Enum):
     HS300 = 300
     HS300CHILD = 3000
     KP115 = 115
+    KP125 = 125
     KP303 = 303
     KP303CHILD = 3030
     UNKNOWN = 9999
