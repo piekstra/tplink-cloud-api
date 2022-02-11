@@ -91,7 +91,7 @@ async def fetch_all_devices_sys_info():
                         if hasattr(x, "__dict__") else x.name if hasattr(x, "name") else None))
       print(json.dumps(await device.get_sys_info(), indent=2, default=lambda x: vars(x)
                         if hasattr(x, "__dict__") else x.name if hasattr(x, "name") else None))
-    tasks.append(get_info(device))
+    fetch_tasks.append(get_info(device))
   await asyncio.gather(*fetch_tasks)
 
 asyncio.run(fetch_all_devices_sys_info())
