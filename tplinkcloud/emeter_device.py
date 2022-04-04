@@ -70,7 +70,6 @@ class TPLinkEMeterDevice(TPLinkDevice):
             None
         )
         if realtime_data is not None and realtime_data.get('err_code') == 0:
-            print(f"Found: {realtime_data}")
             return CurrentPower(realtime_data)
         return None
 
