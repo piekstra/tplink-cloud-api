@@ -84,7 +84,6 @@ class TPLinkEMeterDevice(TPLinkDevice):
         )
         # If there is no data for the requested month, data will be None
         if day_response_data and day_response_data.get('err_code') == 0:
-            print(f"Day response: {day_response_data}")
             return [DayPowerSummary(day_data) for day_data in day_response_data['day_list']]
         return []
 
@@ -98,6 +97,5 @@ class TPLinkEMeterDevice(TPLinkDevice):
         )
         # If there is no data for the requested year, data will be None
         if month_response_data and month_response_data.get('err_code') == 0:
-            print(f"Month response: {month_response_data}")
             return [MonthPowerSummary(month_data) for month_data in month_response_data['month_list']]
         return []
