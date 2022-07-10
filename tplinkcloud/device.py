@@ -65,6 +65,11 @@ class TPLinkDevice:
             return None
 
         request_response = response.get(request_type)
+        # Check to make sure that -- even though we got a response -- the
+        # response contained the requested type
+        if request_response is None:
+            return None
+
         sub_request_response = request_response.get(sub_request_type)
         if self.child_id and sub_request_response.get('children'):
             for child in sub_request_response.get('children'):
@@ -95,6 +100,12 @@ class TPLinkDevice:
 
     async def is_on(self):
         device_sys_info = await self.get_sys_info()
+
+        # get_sys_info can return `None` if something went wrong with the
+        # request -- in this case we pass `None` to caller
+        if device_sys_info is None:
+            return None
+
         sys_info = device_sys_info.__dict__ if hasattr(
             device_sys_info, '__dict__') else device_sys_info
         if self.child_id:
@@ -104,6 +115,12 @@ class TPLinkDevice:
 
     async def is_off(self):
         device_sys_info = await self.get_sys_info()
+
+        # get_sys_info can return `None` if something went wrong with the
+        # request -- in this case we pass `None` to caller
+        if device_sys_info is None:
+            return None
+
         sys_info = device_sys_info.__dict__ if hasattr(
             device_sys_info, '__dict__') else device_sys_info
         if self.child_id:
