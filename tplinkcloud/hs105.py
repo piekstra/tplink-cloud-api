@@ -32,7 +32,8 @@ class HS105SysInfo:
         self.fw_id = sys_info.get('fwId')
         self.device_id = sys_info.get('deviceId')
         self.oem_id = sys_info.get('oemId')
-        self.next_action = HS105Action(sys_info.get('next_action'))
+        if 'next_action' in sys_info.keys():
+            self.next_action = HS105Action(sys_info.get('next_action'))
         self.err_code = sys_info.get('err_code')
 
 
