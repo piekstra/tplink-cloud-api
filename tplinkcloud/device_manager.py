@@ -13,6 +13,7 @@ from .hs300 import HS300
 from .kp115 import KP115
 from .kp125 import KP125
 from .kp303 import KP303
+from .ep40 import EP40
 from .device import TPLinkDevice
 
 
@@ -98,6 +99,8 @@ class TPLinkDeviceManager:
             return KP115(client, tplink_device_info.device_id, tplink_device_info)
         elif tplink_device_info.device_model.startswith('KP125'):
             return KP125(client, tplink_device_info.device_id, tplink_device_info)
+        elif tplink_device_info.device_model.startswith('EP40'):
+            return EP40(client, tplink_device_info.device_id, tplink_device_info)
         elif tplink_device_info.device_model.startswith('KP303'):
             return KP303(client, tplink_device_info.device_id, tplink_device_info)
         else:

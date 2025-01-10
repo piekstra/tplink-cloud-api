@@ -13,3 +13,5 @@ class TPLinkDeviceType(Enum):
     KP303 = 303
     KP303CHILD = 3030
     UNKNOWN = 9999
+    EP40 = 400
+    EP40CHILD = 4000
