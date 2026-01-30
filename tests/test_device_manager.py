@@ -18,7 +18,7 @@ async def client():
     )
 
 
-@pytest.mark.usefixtures('client', 'event_loop')
+@pytest.mark.usefixtures('client')
 class TestGetDevices(object):
 
     @pytest.mark.asyncio
