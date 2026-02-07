@@ -1,48 +1,109 @@
-import requests
+"""Synchronous HTTP client for TP-Link Cloud API authentication and device listing.
+
+Supports both V1 (legacy) and V2 (current) API protocols:
+
+V1: POST https://wap.tplinkcloud.com/?appName=Kasa_Android&...
+    Body: {"method": "login", "params": {"cloudUserName": "...", ...}}
+
+V2: POST https://n-wap.tplinkcloud.com/api/v2/account/login?appName=Kasa_Android_Mix&...
+    Body: {"cloudUserName": "...", "cloudPassword": "...", ...}  (flat, no wrapper)
+    Headers: X-Authorization (HMAC-SHA1 signature), Content-MD5
+"""
+
 import json
 import uuid
 
+import requests
+
 from .api_response import TPLinkApiResponse
+from .certs import get_ca_cert_path
+from .exceptions import (
+    TPLinkAuthError,
+    TPLinkCloudError,
+    TPLinkMFARequiredError,
+    TPLinkTokenExpiredError,
+)
+from .signing import get_signing_headers
+
+# V2 API error codes
+_ERR_MFA_REQUIRED = -20677
+_ERR_TOKEN_EXPIRED = -20651
+_ERR_REFRESH_TOKEN_EXPIRED = -20655
+_ERR_WRONG_CREDENTIALS = -20601
+_ERR_ACCOUNT_LOCKED = -20675
+
+# Default API hosts
+_V1_HOST = "https://wap.tplinkcloud.com"
+_V2_HOST = "https://n-wap.tplinkcloud.com"
+
+# V2 API paths
+_PATH_ACCOUNT_STATUS = "/api/v2/account/getAccountStatusAndUrl"
+_PATH_LOGIN = "/api/v2/account/login"
+_PATH_REFRESH_TOKEN = "/api/v2/account/refreshToken"
+_PATH_MFA_LOGIN = "/api/v2/account/checkMFACodeAndLogin"
 
 
 class TPLinkApi:
     def __init__(self, host=None, verbose=False, term_id=None):
-        self.host = host if host else 'https://wap.tplinkcloud.com'
         self._verbose = verbose
-        self._termId = term_id if term_id else str(uuid.uuid4())
-        self._default_params = {
-            'appName': 'Kasa_Android',
-            'termID': self._termId,
-            'appVer': '1.4.4.607',
-            'ospf': 'Android+6.0.1',
-            'netType': 'wifi',
-            'locale': 'es_ES'
+        self._term_id = term_id or str(uuid.uuid4())
+        self._ca_cert_path = get_ca_cert_path()
+
+        # V2 is the default; V1 host provided for backward compatibility
+        self.host = host or _V2_HOST
+
+        # V2 query parameters (sent on all requests, matching C29914q interceptor)
+        self._query_params = {
+            "appName": "Kasa_Android_Mix",
+            "appVer": "3.4.451",
+            "netType": "wifi",
+            "termID": self._term_id,
+            "ospf": "Android 14",
+            "brand": "TPLINK",
+            "locale": "en_US",
+            "model": "Pixel",
+            "termName": "Pixel",
+            "termMeta": "Pixel",
         }
+
         self._headers = {
-            'User-Agent':
-                'Dalvik/2.1.0 (Linux; U; Android 6.0.1; A0001 Build/M4B30X)',
-            'Content-Type': 'application/json'
+            "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 14; Pixel Build/UP1A)",
+            "Content-Type": "application/json;charset=UTF-8",
         }
 
-    def _request_post(self, body, token=None):
-        if self._verbose:
-            print('POST', self.host, body)
+    def _request_post_v2(self, base_url, url_path, body, token=None):
+        """Make a signed V2 API request.
 
+        Args:
+            base_url: The base URL (e.g. "https://n-use1-wap.tplinkcloud.com").
+            url_path: The API path (e.g. "/api/v2/account/login").
+            body: The request body dict (flat format, no method/params wrapper).
+            token: Optional auth token to include in query params.
+
+        Returns:
+            TPLinkApiResponse
+        """
+        url = f"{base_url}{url_path}"
         body_json = json.dumps(body)
 
+        params = self._query_params.copy()
         if token:
-            params = self._default_params.copy()
-            params['token'] = token
-        else:
-            params = self._default_params
+            params["token"] = token
 
-        s = requests.Session()
-        response = s.request(
-            'POST',
-            self.host,
+        signing_headers = get_signing_headers(body_json, url_path)
+        headers = {**self._headers, **signing_headers}
+
+        if self._verbose:
+            print(f"POST {url}")
+            print(f"Body: {body_json}")
+
+        response = requests.post(
+            url,
             data=body_json,
             params=params,
-            headers=self._headers
+            headers=headers,
+            verify=self._ca_cert_path,
+            timeout=15,
         )
 
         if response.status_code == 200:
@@ -50,40 +111,224 @@ class TPLinkApi:
             if self._verbose:
                 print(json.dumps(response_json, indent=2))
             return TPLinkApiResponse(response_json)
-        elif response.content:
-            raise Exception(str(response.status_code) + ': ' +
-                            response.reason + ': ' + str(response.content))
-        else:
-            raise Exception(str(response.status_code) + ': ' + response.reason)
 
-    # Returns a token if properly authenticated
-    def login(self, username, password):
+        if response.content:
+            raise TPLinkCloudError(
+                f"{response.status_code}: {response.reason}: {response.content!r}"
+            )
+        raise TPLinkCloudError(f"{response.status_code}: {response.reason}")
+
+    def _request_post_v1(self, body, token=None):
+        """Make a V1-style request (method/params wrapper) with V2 signing.
+
+        Device operations still use the V1 JSON format on the root path,
+        but with V2 signing headers and query parameters.
+        """
+        url_path = "/"
+        body_json = json.dumps(body)
+
+        params = self._query_params.copy()
+        if token:
+            params["token"] = token
+
+        signing_headers = get_signing_headers(body_json, url_path)
+        headers = {**self._headers, **signing_headers}
+
+        if self._verbose:
+            print(f"POST {self.host}/")
+            print(f"Body: {body_json}")
+
+        response = requests.post(
+            self.host,
+            data=body_json,
+            params=params,
+            headers=headers,
+            verify=self._ca_cert_path,
+            timeout=15,
+        )
+
+        if response.status_code == 200:
+            response_json = response.json()
+            if self._verbose:
+                print(json.dumps(response_json, indent=2))
+            return TPLinkApiResponse(response_json)
+
+        if response.content:
+            raise TPLinkCloudError(
+                f"{response.status_code}: {response.reason}: {response.content!r}"
+            )
+        raise TPLinkCloudError(f"{response.status_code}: {response.reason}")
+
+    def _get_regional_url(self, username):
+        """Discover the regional API server URL for the given account.
+
+        Returns:
+            The regional appServerUrl string.
+        """
+        body = {
+            "appType": "Kasa_Android_Mix",
+            "cloudUserName": username,
+        }
+        response = self._request_post_v2(
+            self.host, _PATH_ACCOUNT_STATUS, body
+        )
+        if response.successful:
+            return response.result.get("appServerUrl", self.host)
+
+        return self.host
+
+    def login(self, username, password, mfa_callback=None):
+        """Authenticate with the TP-Link Cloud V2 API.
+
+        Flow:
+            1. getAccountStatusAndUrl -> regional URL
+            2. login on regional URL -> token (or MFA challenge)
+            3. If MFA required and callback provided, handle MFA
+
+        Args:
+            username: TP-Link / Kasa account email.
+            password: Account password.
+            mfa_callback: Optional callable(mfa_type, email) -> str that returns
+                         the MFA verification code. If MFA is required and no
+                         callback is provided, raises TPLinkMFARequiredError.
+
+        Returns:
+            Dict with 'token' and optionally 'refreshToken'.
+
+        Raises:
+            TPLinkAuthError: Wrong credentials or account locked.
+            TPLinkMFARequiredError: MFA required but no callback provided.
+        """
         if not username:
             raise ValueError("Cannot login, username is not set")
         if not password:
             raise ValueError("Cannot login, password not set")
-        body = {
-            'method': 'login',
-            'url': self.host,
-            'params': {
-                'appType': 'Kasa_Android',
-                'cloudUserName': username,
-                'cloudPassword': password,
-                'terminalUUID': self._termId
-            }
-        }
-        response = self._request_post(body)
-        if response.successful:
-            return response.result.get('token')
 
-        return None
+        # Step 1: Discover regional URL
+        regional_url = self._get_regional_url(username)
+        self.host = regional_url
+
+        # Step 2: Login
+        login_body = {
+            "appType": "Kasa_Android_Mix",
+            "appVersion": "3.4.451",
+            "cloudPassword": password,
+            "cloudUserName": username,
+            "platform": "Android",
+            "refreshTokenNeeded": True,
+            "supportBindAccount": False,
+            "terminalUUID": self._term_id,
+            "terminalName": "Pixel",
+            "terminalMeta": "Pixel",
+        }
+
+        response = self._request_post_v2(
+            regional_url, _PATH_LOGIN, login_body
+        )
+
+        error_code = response.error_code
+        if error_code == 0:
+            return response.result
+
+        # Handle specific error codes
+        if error_code == _ERR_MFA_REQUIRED:
+            if mfa_callback is None:
+                raise TPLinkMFARequiredError(
+                    "MFA verification required. Provide an mfa_callback.",
+                    error_code=error_code,
+                    mfa_type=response.result.get("mfaType") if response.result else None,
+                    email=username,
+                )
+            # Get MFA code from callback and verify
+            mfa_type = response.result.get("mfaType", "verifyCodeLogin") if response.result else "verifyCodeLogin"
+            mfa_code = mfa_callback(mfa_type, username)
+            return self._verify_mfa(regional_url, username, password, mfa_code)
+
+        if error_code in (_ERR_WRONG_CREDENTIALS, _ERR_ACCOUNT_LOCKED):
+            raise TPLinkAuthError(
+                response.msg or "Authentication failed",
+                error_code=error_code,
+            )
+
+        raise TPLinkCloudError(
+            response.msg or f"Login failed with error code {error_code}",
+            error_code=error_code,
+        )
+
+    def _verify_mfa(self, regional_url, username, password, mfa_code):
+        """Complete MFA verification.
+
+        Returns:
+            Dict with 'token' and optionally 'refreshToken'.
+        """
+        body = {
+            "appType": "Kasa_Android_Mix",
+            "cloudPassword": password,
+            "cloudUserName": username,
+            "code": mfa_code,
+            "terminalUUID": self._term_id,
+        }
+        response = self._request_post_v2(
+            regional_url, _PATH_MFA_LOGIN, body
+        )
+        if response.successful:
+            return response.result
+
+        raise TPLinkAuthError(
+            response.msg or "MFA verification failed",
+            error_code=response.error_code,
+        )
+
+    def refresh_login(self, refresh_token):
+        """Refresh an expired auth token using a refresh token.
+
+        Args:
+            refresh_token: The refresh token from a previous login.
+
+        Returns:
+            Dict with new 'token' and 'refreshToken'.
+
+        Raises:
+            TPLinkTokenExpiredError: If the refresh token itself has expired.
+        """
+        body = {
+            "appType": "Kasa_Android_Mix",
+            "refreshToken": refresh_token,
+            "terminalUUID": self._term_id,
+        }
+        response = self._request_post_v2(
+            self.host, _PATH_REFRESH_TOKEN, body
+        )
+        if response.successful:
+            return response.result
+
+        if response.error_code == _ERR_REFRESH_TOKEN_EXPIRED:
+            raise TPLinkTokenExpiredError(
+                "Refresh token has expired. Full re-login required.",
+                error_code=response.error_code,
+            )
+
+        raise TPLinkCloudError(
+            response.msg or f"Token refresh failed with error code {response.error_code}",
+            error_code=response.error_code,
+        )
 
     def get_device_info_list(self, token):
+        """Get the list of devices registered to the account.
+
+        Uses V1-style request format with V2 signing.
+        """
         body = {
-            'method': 'getDeviceList'
+            "method": "getDeviceList",
         }
-        response = self._request_post(body, token)
+        response = self._request_post_v1(body, token)
         if response.successful:
-            return response.result.get('deviceList')
+            return response.result.get("deviceList", [])
+
+        if response.error_code == _ERR_TOKEN_EXPIRED:
+            raise TPLinkTokenExpiredError(
+                "Auth token expired",
+                error_code=response.error_code,
+            )
 
         return []

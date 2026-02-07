@@ -12,6 +12,9 @@ setup(
     author='Dev Piekstra',
     author_email='piekstra.dev@gmail.com',
     packages=find_packages(exclude=("tests",)),
+    package_data={
+        'tplinkcloud': ['certs/*.pem'],
+    },
     version=__version__,
     description='Python library for communicating with the TP-Link Cloud API to manage TP-Link Kasa Smart Home devices',
     long_description=long_description,
@@ -21,7 +24,7 @@ setup(
         'aiohttp>=3,<4'
     ],
     url='https://github.com/piekstra/tplink-cloud-api',
-    python_requires='>=3.7',
+    python_requires='>=3.10',
     zip_safe=False,
     license='GPL-3',
     classifiers=[
