@@ -10,10 +10,15 @@ from .hs100 import HS100
 from .hs103 import HS103
 from .hs105 import HS105
 from .hs110 import HS110
+from .hs200 import HS200
 from .hs300 import HS300
+from .kl420l5 import KL420L5
+from .kl430 import KL430
 from .kp115 import KP115
 from .kp125 import KP125
+from .kp200 import KP200
 from .kp303 import KP303
+from .kp400 import KP400
 from .ep40 import EP40
 from .device import TPLinkDevice
 
@@ -100,24 +105,35 @@ class TPLinkDeviceManager:
             verbose=self._verbose,
             term_id=self._term_id
         )
-        if tplink_device_info.device_model.startswith('HS100'):
+        model = tplink_device_info.device_model
+        if model.startswith('HS100'):
             return HS100(client, tplink_device_info.device_id, tplink_device_info)
-        elif tplink_device_info.device_model.startswith('HS103'):
+        elif model.startswith('HS103'):
             return HS103(client, tplink_device_info.device_id, tplink_device_info)
-        elif tplink_device_info.device_model.startswith('HS105'):
+        elif model.startswith('HS105'):
             return HS105(client, tplink_device_info.device_id, tplink_device_info)
-        elif tplink_device_info.device_model.startswith('HS110'):
+        elif model.startswith('HS110'):
             return HS110(client, tplink_device_info.device_id, tplink_device_info)
-        elif tplink_device_info.device_model.startswith('HS300'):
+        elif model.startswith('HS200'):
+            return HS200(client, tplink_device_info.device_id, tplink_device_info)
+        elif model.startswith('HS300'):
             return HS300(client, tplink_device_info.device_id, tplink_device_info)
-        elif tplink_device_info.device_model.startswith('KP115'):
+        elif model.startswith('KL420L5'):
+            return KL420L5(client, tplink_device_info.device_id, tplink_device_info)
+        elif model.startswith('KL430'):
+            return KL430(client, tplink_device_info.device_id, tplink_device_info)
+        elif model.startswith('KP115'):
             return KP115(client, tplink_device_info.device_id, tplink_device_info)
-        elif tplink_device_info.device_model.startswith('KP125'):
+        elif model.startswith('KP125'):
             return KP125(client, tplink_device_info.device_id, tplink_device_info)
-        elif tplink_device_info.device_model.startswith('EP40'):
-            return EP40(client, tplink_device_info.device_id, tplink_device_info)
-        elif tplink_device_info.device_model.startswith('KP303'):
+        elif model.startswith('KP200'):
+            return KP200(client, tplink_device_info.device_id, tplink_device_info)
+        elif model.startswith('KP303'):
             return KP303(client, tplink_device_info.device_id, tplink_device_info)
+        elif model.startswith('KP400'):
+            return KP400(client, tplink_device_info.device_id, tplink_device_info)
+        elif model.startswith('EP40'):
+            return EP40(client, tplink_device_info.device_id, tplink_device_info)
         else:
             return TPLinkDevice(client, tplink_device_info.device_id, tplink_device_info)
 
