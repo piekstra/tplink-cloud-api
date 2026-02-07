@@ -3,6 +3,7 @@ import asyncio
 from .device_info import TPLinkDeviceInfo
 from .device_client import TPLinkDeviceClient
 from .client import TPLinkApi
+from .exceptions import TPLinkTokenExpiredError
 
 # Supported devices
 from .hs100 import HS100
@@ -27,19 +28,24 @@ class TPLinkDeviceManager:
         cache_devices=True,
         tplink_cloud_api_host=None,
         verbose=False,
-        term_id=None
+        term_id=None,
+        mfa_callback=None,
     ):
         self._verbose = verbose
         self._cache_devices = cache_devices
         self._cached_devices = None
         self._term_id = term_id
         self._auth_token = None
+        self._refresh_token = None
+        self._username = username
+        self._password = password
+        self._mfa_callback = mfa_callback
 
         self._tplink_api = TPLinkApi(
             tplink_cloud_api_host, verbose=self._verbose, term_id=self._term_id)
 
         if username and password:
-            self.login(username, password)
+            self.login(username, password, mfa_callback=mfa_callback)
         self._prefetch = prefetch
 
     async def async_init(self):
@@ -55,8 +61,16 @@ class TPLinkDeviceManager:
         if self._cached_devices:
             return self._cached_devices
 
-        device_info_list = self._tplink_api.get_device_info_list(
-            self._auth_token)
+        try:
+            device_info_list = self._tplink_api.get_device_info_list(
+                self._auth_token)
+        except TPLinkTokenExpiredError:
+            if self._refresh_token:
+                self._do_refresh()
+                device_info_list = self._tplink_api.get_device_info_list(
+                    self._auth_token)
+            else:
+                raise
 
         devices = []
         children_gather_tasks = []
@@ -107,17 +121,36 @@ class TPLinkDeviceManager:
         else:
             return TPLinkDevice(client, tplink_device_info.device_id, tplink_device_info)
 
-    def login(self, username, password):
-        # Note that this token expires after some amount of time
-        # (Currently unkown what exactly that expiration time is)
-        auth_token = self._tplink_api.login(username, password)
-        self.set_auth_token(auth_token)
-        return auth_token
+    def login(self, username, password, mfa_callback=None):
+        result = self._tplink_api.login(
+            username, password, mfa_callback=mfa_callback
+        )
+        if result:
+            self.set_auth_token(result.get('token'))
+            self._refresh_token = result.get('refreshToken')
+        return self._auth_token
+
+    def _do_refresh(self):
+        """Refresh the auth token using the stored refresh token."""
+        result = self._tplink_api.refresh_login(self._refresh_token)
+        if result:
+            self.set_auth_token(result.get('token'))
+            self._refresh_token = result.get('refreshToken')
 
     def set_auth_token(self, auth_token):
-        # this token is used for all requests to the TP-Link API
-        # where authentication is required
         self._auth_token = auth_token
+
+    def get_token(self):
+        """Get the current auth token."""
+        return self._auth_token
+
+    def set_refresh_token(self, refresh_token):
+        """Set the refresh token (e.g. when resuming a session)."""
+        self._refresh_token = refresh_token
+
+    def get_refresh_token(self):
+        """Get the current refresh token."""
+        return self._refresh_token
 
     async def find_device(self, device_name):
         devices = await self.get_devices()
