@@ -217,6 +217,26 @@ class TestAuth(object):
         assert device_manager is not None
 
     @pytest.mark.asyncio
+    async def test_auth_token_initialized_without_credentials(self, client):
+        # Regression test for issue #75
+        # When creating a device manager without credentials, _auth_token should
+        # still be initialized to None to avoid AttributeError
+        device_manager = TPLinkDeviceManager(
+            username=None,
+            password=None,
+            prefetch=True,  # This is the default that triggered the bug
+            cache_devices=True,
+            tplink_cloud_api_host=os.environ.get('TPLINK_KASA_API_URL'),
+            verbose=False,
+            term_id=os.environ.get('TPLINK_KASA_TERM_ID')
+        )
+        # Should be able to access _auth_token without AttributeError
+        assert device_manager._auth_token is None
+        # Should be able to set auth token manually
+        device_manager.set_auth_token('test_token')
+        assert device_manager._auth_token == 'test_token'
+
+    @pytest.mark.asyncio
     async def test_auth_no_username(self, client):
         with pytest.raises(ValueError):
             device_manager = await TPLinkDeviceManager(

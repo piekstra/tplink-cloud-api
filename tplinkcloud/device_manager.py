@@ -33,6 +33,7 @@ class TPLinkDeviceManager:
         self._cache_devices = cache_devices
         self._cached_devices = None
         self._term_id = term_id
+        self._auth_token = None
 
         self._tplink_api = TPLinkApi(
             tplink_cloud_api_host, verbose=self._verbose, term_id=self._term_id)
