@@ -62,6 +62,11 @@ class TPLinkDeviceClient:
         }
         response = await self._request_post(body)
         if response.successful:
-            return json.loads(response.result.get('responseData'))
+            response_data = response.result.get('responseData')
+            # Some devices (e.g., Archer routers) return responseData as a dict
+            # while others return it as a JSON string
+            if isinstance(response_data, str):
+                return json.loads(response_data)
+            return response_data
 
         return None
