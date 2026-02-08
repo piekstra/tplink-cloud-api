@@ -1,13 +1,11 @@
 """Synchronous HTTP client for TP-Link Cloud API authentication and device listing.
 
-Supports both V1 (legacy) and V2 (current) API protocols:
+Supports both Kasa and Tapo cloud APIs using the V2 protocol:
 
-V1: POST https://wap.tplinkcloud.com/?appName=Kasa_Android&...
-    Body: {"method": "login", "params": {"cloudUserName": "...", ...}}
+Kasa: POST https://n-wap.tplinkcloud.com/api/v2/account/login?appName=Kasa_Android_Mix&...
+Tapo: POST https://n-wap.i.tplinkcloud.com/api/v2/account/login?appName=TP-Link_Tapo_Android&...
 
-V2: POST https://n-wap.tplinkcloud.com/api/v2/account/login?appName=Kasa_Android_Mix&...
-    Body: {"cloudUserName": "...", "cloudPassword": "...", ...}  (flat, no wrapper)
-    Headers: X-Authorization (HMAC-SHA1 signature), Content-MD5
+Both use the same signing algorithm (HMAC-SHA1) but with different key pairs.
 """
 
 import json
@@ -23,7 +21,13 @@ from .exceptions import (
     TPLinkMFARequiredError,
     TPLinkTokenExpiredError,
 )
-from .signing import get_signing_headers
+from .signing import (
+    KASA_ACCESS_KEY,
+    KASA_SECRET_KEY,
+    TAPO_ACCESS_KEY,
+    TAPO_SECRET_KEY,
+    get_signing_headers,
+)
 
 # V2 API error codes
 _ERR_MFA_REQUIRED = -20677
@@ -32,11 +36,19 @@ _ERR_REFRESH_TOKEN_EXPIRED = -20655
 _ERR_WRONG_CREDENTIALS = -20601
 _ERR_ACCOUNT_LOCKED = -20675
 
-# Default API hosts
-_V1_HOST = "https://wap.tplinkcloud.com"
-_V2_HOST = "https://n-wap.tplinkcloud.com"
+# Kasa cloud
+KASA_HOST = "https://n-wap.tplinkcloud.com"
+KASA_APP_TYPE = "Kasa_Android_Mix"
+KASA_APP_NAME = "Kasa_Android_Mix"
+KASA_APP_VER = "3.4.451"
 
-# V2 API paths
+# Tapo cloud
+TAPO_HOST = "https://n-wap.i.tplinkcloud.com"
+TAPO_APP_TYPE = "TP-Link_Tapo_Android"
+TAPO_APP_NAME = "TP-Link_Tapo_Android"
+TAPO_APP_VER = "3.4.451"
+
+# V2 API paths (shared by both Kasa and Tapo)
 _PATH_ACCOUNT_STATUS = "/api/v2/account/getAccountStatusAndUrl"
 _PATH_LOGIN = "/api/v2/account/login"
 _PATH_REFRESH_TOKEN = "/api/v2/account/refreshToken"
@@ -44,18 +56,34 @@ _PATH_MFA_LOGIN = "/api/v2/account/checkMFACodeAndLogin"
 
 
 class TPLinkApi:
-    def __init__(self, host=None, verbose=False, term_id=None):
+    def __init__(self, host=None, verbose=False, term_id=None,
+                 cloud_type="kasa"):
         self._verbose = verbose
         self._term_id = term_id or str(uuid.uuid4())
         self._ca_cert_path = get_ca_cert_path()
+        self._cloud_type = cloud_type
 
-        # V2 is the default; V1 host provided for backward compatibility
-        self.host = host or _V2_HOST
+        if cloud_type == "tapo":
+            self._access_key = TAPO_ACCESS_KEY
+            self._secret_key = TAPO_SECRET_KEY
+            self._app_type = TAPO_APP_TYPE
+            self._app_name = TAPO_APP_NAME
+            self._app_ver = TAPO_APP_VER
+            default_host = TAPO_HOST
+        else:
+            self._access_key = KASA_ACCESS_KEY
+            self._secret_key = KASA_SECRET_KEY
+            self._app_type = KASA_APP_TYPE
+            self._app_name = KASA_APP_NAME
+            self._app_ver = KASA_APP_VER
+            default_host = KASA_HOST
 
-        # V2 query parameters (sent on all requests, matching C29914q interceptor)
+        self.host = host or default_host
+
+        # V2 query parameters (sent on all requests)
         self._query_params = {
-            "appName": "Kasa_Android_Mix",
-            "appVer": "3.4.451",
+            "appName": self._app_name,
+            "appVer": self._app_ver,
             "netType": "wifi",
             "termID": self._term_id,
             "ospf": "Android 14",
@@ -70,6 +98,18 @@ class TPLinkApi:
             "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 14; Pixel Build/UP1A)",
             "Content-Type": "application/json;charset=UTF-8",
         }
+
+    @property
+    def cloud_type(self):
+        return self._cloud_type
+
+    @property
+    def access_key(self):
+        return self._access_key
+
+    @property
+    def secret_key(self):
+        return self._secret_key
 
     def _request_post_v2(self, base_url, url_path, body, token=None):
         """Make a signed V2 API request.
@@ -90,7 +130,11 @@ class TPLinkApi:
         if token:
             params["token"] = token
 
-        signing_headers = get_signing_headers(body_json, url_path)
+        signing_headers = get_signing_headers(
+            body_json, url_path,
+            access_key=self._access_key,
+            secret_key=self._secret_key,
+        )
         headers = {**self._headers, **signing_headers}
 
         if self._verbose:
@@ -121,7 +165,7 @@ class TPLinkApi:
     def _request_post_v1(self, body, token=None):
         """Make a V1-style request (method/params wrapper) with V2 signing.
 
-        Device operations still use the V1 JSON format on the root path,
+        Kasa device operations use the V1 JSON format on the root path,
         but with V2 signing headers and query parameters.
         """
         url_path = "/"
@@ -131,7 +175,11 @@ class TPLinkApi:
         if token:
             params["token"] = token
 
-        signing_headers = get_signing_headers(body_json, url_path)
+        signing_headers = get_signing_headers(
+            body_json, url_path,
+            access_key=self._access_key,
+            secret_key=self._secret_key,
+        )
         headers = {**self._headers, **signing_headers}
 
         if self._verbose:
@@ -166,7 +214,7 @@ class TPLinkApi:
             The regional appServerUrl string.
         """
         body = {
-            "appType": "Kasa_Android_Mix",
+            "appType": self._app_type,
             "cloudUserName": username,
         }
         response = self._request_post_v2(
@@ -210,8 +258,8 @@ class TPLinkApi:
 
         # Step 2: Login
         login_body = {
-            "appType": "Kasa_Android_Mix",
-            "appVersion": "3.4.451",
+            "appType": self._app_type,
+            "appVersion": self._app_ver,
             "cloudPassword": password,
             "cloudUserName": username,
             "platform": "Android",
@@ -262,7 +310,7 @@ class TPLinkApi:
             Dict with 'token' and optionally 'refreshToken'.
         """
         body = {
-            "appType": "Kasa_Android_Mix",
+            "appType": self._app_type,
             "cloudPassword": password,
             "cloudUserName": username,
             "code": mfa_code,
@@ -292,7 +340,7 @@ class TPLinkApi:
             TPLinkTokenExpiredError: If the refresh token itself has expired.
         """
         body = {
-            "appType": "Kasa_Android_Mix",
+            "appType": self._app_type,
             "refreshToken": refresh_token,
             "terminalUUID": self._term_id,
         }

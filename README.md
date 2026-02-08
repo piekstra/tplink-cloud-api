@@ -1,6 +1,6 @@
 # tplink-cloud-api
 
-Control TP-Link Kasa smart home devices from anywhere over the internet using TP-Link's cloud API — no local network access required.
+Control TP-Link Kasa and Tapo smart home devices from anywhere over the internet using TP-Link's cloud API — no local network access required.
 
 ## Why cloud control?
 
@@ -17,13 +17,15 @@ If you just need local control on the same network as your devices, [python-kasa
 
 ## How it works
 
-The library authenticates with your TP-Link / Kasa account credentials using the **V2 TP-Link Cloud API** with HMAC-SHA1 request signing. It supports MFA (two-factor authentication) and automatic refresh token management.
+The library authenticates with your TP-Link / Kasa account credentials using the **V2 TP-Link Cloud API** with HMAC-SHA1 request signing. It automatically connects to both the Kasa and Tapo clouds in parallel, returning a unified device list. It supports MFA (two-factor authentication) and automatic refresh token management.
 
 Originally a Python port of [Adumont's Node.js module](https://github.com/adumont/tplink-cloud-api).
 
 ## Device Compatibility
 
 The following devices are _officially_ supported by the library at this time:
+
+### Kasa Devices
 
 **Smart Plugs**
 * HS100 (Smart Plug - Blocks two outlets as a single outlet)
@@ -48,6 +50,17 @@ The following devices are _officially_ supported by the library at this time:
 **Smart Light Strips**
 * KL420L5 (Smart LED Light Strip)
 * KL430 (Smart Light Strip, Multicolor)
+
+### Tapo Devices
+
+Tapo devices are supported through the Tapo cloud API. The library automatically authenticates against both clouds and returns a unified device list. All Tapo devices support basic on/off control through the generic `TPLinkDevice` class:
+
+* P100 (Mini Smart Wi-Fi Plug)
+* P110 (Mini Smart Wi-Fi Plug with Energy Monitoring)
+* L530 (Smart Wi-Fi Light Bulb, Multicolor)
+* Any other Tapo device registered to your TP-Link account
+
+Each device has a `cloud_type` attribute ("kasa" or "tapo") so you can identify which cloud it belongs to.
 
 Devices not explicitly listed above will still work with basic on/off functionality through the generic `TPLinkDevice` class.
 
@@ -194,7 +207,13 @@ devices = await device_manager.get_devices()
 if devices:
   print(f'Found {len(devices)} devices')
   for device in devices:
-    print(f'{device.model_type.name} device called {device.get_alias()}')
+    print(f'[{device.cloud_type}] {device.model_type.name} device called {device.get_alias()}')
+```
+
+By default, `get_devices()` returns devices from both the Kasa and Tapo clouds. To disable Tapo device discovery:
+
+```python
+device_manager = TPLinkDeviceManager(username, password, include_tapo=False)
 ```
 
 ### Control your devices
@@ -213,7 +232,7 @@ else:
   print(f'Could not find {device_name}')
 ```
 
-Replace `My Smart Plug` with the alias you gave to your plug in the Kasa app (be sure to give a different alias to each device). Instead of `toggle()`, you can also use `power_on()` or `power_off()`.
+Replace `My Smart Plug` with the alias you gave to your plug in the Kasa or Tapo app (be sure to give a different alias to each device). Instead of `toggle()`, you can also use `power_on()` or `power_off()`.
 
 To retrieve power consumption data for one of the individual plugs on an HS300 power strip (KP303 does not support power usage data):
 

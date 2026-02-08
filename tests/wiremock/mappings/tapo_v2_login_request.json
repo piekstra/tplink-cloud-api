@@ -1,0 +1,30 @@
+{
+    "request": {
+        "method": "POST",
+        "urlPath": "/api/v2/account/login",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "appType": "TP-Link_Tapo_Android",
+                    "appVersion": "3.4.451",
+                    "cloudPassword": "kasa_password",
+                    "cloudUserName": "kasa_docker",
+                    "platform": "Android",
+                    "refreshTokenNeeded": true,
+                    "supportBindAccount": false,
+                    "terminalUUID": "2a8ced52-f200-4b79-a1fe-2f6b58193c4c",
+                    "terminalName": "Pixel",
+                    "terminalMeta": "Pixel"
+                }
+            }
+        ],
+        "headers": {
+            "User-Agent": { "matches": "Dalvik/.*" },
+            "Content-Type": { "matches": "application/json.*" }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "tapo_v2_login_response.json"
+    }
+}
