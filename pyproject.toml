@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tplink-cloud-api"
+version = "5.0.0"
+description = "Python library for controlling TP-Link Kasa smart home devices via the TP-Link Cloud API"
+readme = "README.md"
+license = "GPL-3.0-only"
+requires-python = ">=3.10"
+authors = [
+    { name = "Dev Piekstra", email = "piekstra.dev@gmail.com" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests>=2,<3",
+    "aiohttp>=3.9,<4",
+]
+
+[project.urls]
+Homepage = "https://github.com/piekstra/tplink-cloud-api"
+Repository = "https://github.com/piekstra/tplink-cloud-api"
+Issues = "https://github.com/piekstra/tplink-cloud-api/issues"
+
+[tool.setuptools.packages.find]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+tplinkcloud = ["certs/*.pem"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
