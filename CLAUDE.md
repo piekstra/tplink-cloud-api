@@ -131,6 +131,10 @@ These are set in `tests/local_env_vars.py` and must match the wiremock stubs:
 
 Mappings use `"urlPath": "/"` with body pattern matching. Headers use `"matches"` for flexible User-Agent and Content-Type matching.
 
+## Related projects
+
+- **[tplink-cloud-cli](https://github.com/piekstra/tplink-cloud-cli)** — Rust CLI (`tplc`) that reimplements this library's API calls for terminal and AI agent usage. Mirrors the dual-cloud architecture and device support.
+
 ## Project tracking
 
 - GitHub Project: https://github.com/users/piekstra/projects/2

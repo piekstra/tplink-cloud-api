@@ -392,3 +392,7 @@ pytest --verbose
 #### GitHub Testing
 
 This project leverages GitHub Actions and has a [workflow](.github/workflows/python-package.yml) that will run these tests. The environment configuration for the tests must have parity with the [`local_env_vars.py`](tests/local_env_vars.py) file from the [local testing](#local-testing).
+
+## Related projects
+
+- **[tplink-cloud-cli](https://github.com/piekstra/tplink-cloud-cli)** — A cross-platform CLI (`tplc`) built in Rust that reimplements this library's API calls for terminal and AI agent usage. Supports both Kasa and Tapo clouds.
