@@ -1,6 +1,6 @@
 # tplink-cloud-api
 
-Python library for controlling TP-Link Kasa smart home devices remotely via the TP-Link Cloud API. Unlike local-network libraries, this works from anywhere with an internet connection.
+Python library for controlling TP-Link Kasa and Tapo smart home devices remotely via the TP-Link Cloud API. Unlike local-network libraries, this works from anywhere with an internet connection.
 
 ## Quick start
 
@@ -21,16 +21,32 @@ pytest --verbose
 2. **Login** (`/api/v2/account/login`) — authenticates with TP-Link credentials, returns token + refresh token
 3. **Device operations** — POST to `/` on the device's `appServerUrl` with V2 signing headers
 
-All V2 requests use HMAC-SHA1 signing (see `tplinkcloud/signing.py`). The signing keys are app-level constants extracted from the Kasa Android APK — they are not secrets.
+All V2 requests use HMAC-SHA1 signing (see `tplinkcloud/signing.py`). The signing keys are app-level constants extracted from the Kasa and Tapo Android APKs — they are not secrets.
+
+### Dual-cloud architecture (Kasa + Tapo)
+
+The library authenticates against both Kasa and Tapo clouds in parallel using the same TP-Link credentials. Each cloud has its own host, signing keys, and app identifiers:
+
+| Aspect | Kasa | Tapo |
+|--------|------|------|
+| Cloud host | `n-wap.tplinkcloud.com` | `n-wap.i.tplinkcloud.com` |
+| App type | `Kasa_Android_Mix` | `TP-Link_Tapo_Android` |
+| Passthrough URL | POST `/` with `{"method":"passthrough","params":{...}}` | POST `/api/v2/common/passthrough` with flat `{deviceId, requestData}` |
+| Signing algorithm | HMAC-SHA1 (same) | HMAC-SHA1 (same) |
+
+`TPLinkDeviceManager` creates two `TPLinkApi` instances, logs into both, and merges device lists with deduplication by device ID. Each device has a `cloud_type` attribute ("kasa" or "tapo"). Tapo login failure is silently caught — the library falls back to Kasa-only.
+
+Set `include_tapo=False` on `TPLinkDeviceManager` to disable Tapo cloud support.
 
 ### Key modules
 
 | Module | Purpose |
 |---|---|
-| `client.py` | Synchronous HTTP client for auth (login, MFA, refresh, device list) |
-| `device_client.py` | Async HTTP client (aiohttp) for device operations with V2 signing |
-| `device_manager.py` | Main entry point — `TPLinkDeviceManager` handles auth + device construction |
-| `signing.py` | HMAC-SHA1 request signing for V2 API |
+| `client.py` | Synchronous HTTP client for auth (login, MFA, refresh, device list); supports both Kasa and Tapo cloud types |
+| `device_client.py` | Async HTTP client (aiohttp) for device operations with V2 signing; handles Kasa and Tapo passthrough formats |
+| `device_manager.py` | Main entry point — `TPLinkDeviceManager` handles dual-cloud auth + unified device construction |
+| `device_info.py` | Device metadata including `cloud_type` ("kasa" or "tapo") |
+| `signing.py` | HMAC-SHA1 request signing for V2 API with configurable key pairs |
 | `exceptions.py` | `TPLinkAuthError`, `TPLinkMFARequiredError`, `TPLinkTokenExpiredError`, `TPLinkCloudError`, `TPLinkDeviceOfflineError` |
 | `certs/` | TP-Link private CA cert chain (V2 API servers use their own CA) |
 
