@@ -1,6 +1,6 @@
 class TPLinkDeviceInfo:
 
-    def __init__(self, device_info):
+    def __init__(self, device_info, cloud_type="kasa"):
         self.device_type = device_info.get('deviceType')
         self.role = device_info.get('role')
         self.fw_ver = device_info.get('fwVer')
@@ -17,3 +17,4 @@ class TPLinkDeviceInfo:
         self.fw_id = device_info.get('fwId')
         self.is_same_region = device_info.get('isSameRegion')
         self.status = device_info.get('status')
+        self.cloud_type = cloud_type

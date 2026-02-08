@@ -1,0 +1,22 @@
+{
+    "request": {
+        "method": "POST",
+        "urlPath": "/api/v2/account/getAccountStatusAndUrl",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "appType": "TP-Link_Tapo_Android",
+                    "cloudUserName": "kasa_docker"
+                }
+            }
+        ],
+        "headers": {
+            "User-Agent": { "matches": "Dalvik/.*" },
+            "Content-Type": { "matches": "application/json.*" }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "tapo_v2_account_status_response.json"
+    }
+}

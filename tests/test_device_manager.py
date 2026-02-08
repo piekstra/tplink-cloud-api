@@ -25,10 +25,12 @@ class TestGetDevices(object):
     async def test_gets_devices(self, client):
         device_list = await client.get_devices()
         assert device_list is not None
-        # 9 devices: HS103, HS105, HS110, HS300 (6 children), KL430,
-        #            HS200, KP200 (2 children), KP400 (2 children), KL420L5
-        # Total: 9 parents + 6 + 2 + 2 children = 19
-        assert len(device_list) == 19
+        # Kasa: 9 parents + 10 children = 19
+        #   HS103, HS105, HS110, HS300 (6 children), KL430,
+        #   HS200, KP200 (2 children), KP400 (2 children), KL420L5
+        # Tapo: 3 devices (P100, P110, L530)
+        # Total: 19 + 3 = 22
+        assert len(device_list) == 22
 
 @pytest.mark.usefixtures('client')
 class TestFindDevice(object):
@@ -295,11 +297,11 @@ class TestAuth(object):
             verbose=False,
             term_id=os.environ.get('TPLINK_KASA_TERM_ID')
         )
-        # Should be able to access _auth_token without AttributeError
-        assert device_manager._auth_token is None
+        # Should be able to access token without AttributeError
+        assert device_manager.get_token() is None
         # Should be able to set auth token manually
         device_manager.set_auth_token('test_token')
-        assert device_manager._auth_token == 'test_token'
+        assert device_manager.get_token() == 'test_token'
 
     @pytest.mark.asyncio
     async def test_auth_no_username(self, client):

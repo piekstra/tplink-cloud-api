@@ -1,0 +1,25 @@
+{
+    "priority": 1,
+    "request": {
+        "method": "POST",
+        "urlPath": "/",
+        "queryParameters": {
+            "appName": { "equalTo": "TP-Link_Tapo_Android" }
+        },
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "method": "getDeviceList"
+                }
+            }
+        ],
+        "headers": {
+            "User-Agent": { "matches": "Dalvik/.*" },
+            "Content-Type": { "matches": "application/json.*" }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "tapo_get_device_list_response.json"
+    }
+}

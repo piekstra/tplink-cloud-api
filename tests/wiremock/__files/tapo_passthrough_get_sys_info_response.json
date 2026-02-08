@@ -1,0 +1,6 @@
+{
+    "error_code": 0,
+    "result": {
+        "responseData": "{\"system\":{\"get_sysinfo\":{\"sw_ver\":\"1.3.0 Build 230425 Rel.163532\",\"hw_ver\":\"1.0\",\"model\":\"P100\",\"deviceId\":\"TAPO_P100_ABCDEF1234567890ABCDEF1234567890\",\"alias\":\"Kitchen Tapo Plug\",\"relay_state\":1,\"on_time\":12345,\"feature\":\"TIM\",\"rssi\":-45,\"err_code\":0}}}"
+    }
+}

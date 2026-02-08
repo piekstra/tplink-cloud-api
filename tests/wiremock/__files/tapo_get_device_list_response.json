@@ -1,0 +1,61 @@
+{
+    "error_code": 0,
+    "result": {
+        "deviceList": [
+            {
+                "deviceType": "SMART.TAPOPLUG",
+                "role": 0,
+                "fwVer": "1.3.0 Build 230425 Rel.163532",
+                "appServerUrl": "http://127.0.0.1:8080",
+                "deviceRegion": "us-east-1",
+                "deviceId": "TAPO_P100_ABCDEF1234567890ABCDEF1234567890",
+                "deviceName": "Tapo Mini Smart Wi-Fi Plug",
+                "deviceHwVer": "1.0",
+                "alias": "Kitchen Tapo Plug",
+                "deviceMac": "TAPO11223344",
+                "oemId": "TAPO1234EFGH5678ABCD1234EFGH5678",
+                "deviceModel": "P100",
+                "hwId": "TAPOABCD5678EFGH1234ABCD5678EFGH",
+                "fwId": "00000000000000000000000000000000",
+                "isSameRegion": true,
+                "status": 1
+            },
+            {
+                "deviceType": "SMART.TAPOPLUG",
+                "role": 0,
+                "fwVer": "1.2.1 Build 230425 Rel.163532",
+                "appServerUrl": "http://127.0.0.1:8080",
+                "deviceRegion": "us-east-1",
+                "deviceId": "TAPO_P110_BCDEF1234567890ABCDEF1234567890A",
+                "deviceName": "Tapo Mini Smart Wi-Fi Plug with Energy Monitoring",
+                "deviceHwVer": "1.0",
+                "alias": "Office Tapo Energy Plug",
+                "deviceMac": "TAPO55667788",
+                "oemId": "TAPO5678ABCD1234EFGH5678ABCD1234",
+                "deviceModel": "P110",
+                "hwId": "TAPOEFGH1234ABCD5678EFGH1234ABCD",
+                "fwId": "00000000000000000000000000000000",
+                "isSameRegion": true,
+                "status": 1
+            },
+            {
+                "deviceType": "SMART.TAPOBULB",
+                "role": 0,
+                "fwVer": "1.1.0 Build 230602 Rel.145203",
+                "appServerUrl": "http://127.0.0.1:8080",
+                "deviceRegion": "us-east-1",
+                "deviceId": "TAPO_L530_CDEF1234567890ABCDEF1234567890AB",
+                "deviceName": "Tapo Smart Wi-Fi Light Bulb, Multicolor",
+                "deviceHwVer": "2.0",
+                "alias": "Living Room Tapo Bulb",
+                "deviceMac": "TAPO99AABBCC",
+                "oemId": "TAPOBULB1234EFGH5678ABCD1234EFGH",
+                "deviceModel": "L530",
+                "hwId": "TAPOBULBABCD5678EFGH1234ABCD5678",
+                "fwId": "00000000000000000000000000000000",
+                "isSameRegion": true,
+                "status": 1
+            }
+        ]
+    }
+}

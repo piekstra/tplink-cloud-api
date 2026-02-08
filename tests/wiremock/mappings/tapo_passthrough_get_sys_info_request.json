@@ -1,0 +1,25 @@
+{
+    "request": {
+        "method": "POST",
+        "urlPath": "/api/v2/common/passthrough",
+        "bodyPatterns": [
+            {
+                "matchesJsonPath": "$.deviceId"
+            },
+            {
+                "matchesJsonPath": {
+                    "expression": "$.requestData",
+                    "contains": "get_sysinfo"
+                }
+            }
+        ],
+        "headers": {
+            "User-Agent": { "matches": "Dalvik/.*" },
+            "Content-Type": { "matches": "application/json.*" }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "tapo_passthrough_get_sys_info_response.json"
+    }
+}
