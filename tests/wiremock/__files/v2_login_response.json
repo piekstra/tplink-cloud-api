@@ -4,7 +4,8 @@
         "accountId": "123456",
         "regTime": "2017-11-27 23:21:40",
         "countryCode": "US",
-        "email": "example@gmail.com",
-        "token": "abcdef-AB1234cdeTKJH123kja0"
+        "email": "kasa_docker",
+        "token": "abcdef-AB1234cdeTKJH123kja0",
+        "refreshToken": "refresh-token-mock-abc123"
     }
 }

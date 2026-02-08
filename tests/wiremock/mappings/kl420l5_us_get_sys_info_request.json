@@ -5,7 +5,11 @@
         "bodyPatterns": [
             {
                 "equalToJson": {
-                    "method": "getDeviceList"
+                    "method": "passthrough",
+                    "params": {
+                        "deviceId": "D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1D4E50004",
+                        "requestData": "{\"system\": {\"get_sysinfo\": null}}"
+                    }
                 }
             }
         ],
@@ -16,6 +20,6 @@
     },
     "response": {
         "status": 200,
-        "bodyFileName": "get_device_list_response.json"
+        "bodyFileName": "kl420l5_us_get_sys_info_response.json"
     }
 }

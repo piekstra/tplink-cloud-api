@@ -5,7 +5,11 @@
         "bodyPatterns": [
             {
                 "equalToJson": {
-                    "method": "getDeviceList"
+                    "method": "passthrough",
+                    "params": {
+                        "deviceId": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4A1B20001",
+                        "requestData": "{\"system\": {\"get_sysinfo\": null}}"
+                    }
                 }
             }
         ],
@@ -16,6 +20,6 @@
     },
     "response": {
         "status": 200,
-        "bodyFileName": "get_device_list_response.json"
+        "bodyFileName": "hs200_us_get_sys_info_response.json"
     }
 }

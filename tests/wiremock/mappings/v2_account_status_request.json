@@ -1,11 +1,12 @@
 {
     "request": {
         "method": "POST",
-        "urlPath": "/",
+        "urlPath": "/api/v2/account/getAccountStatusAndUrl",
         "bodyPatterns": [
             {
                 "equalToJson": {
-                    "method": "getDeviceList"
+                    "appType": "Kasa_Android_Mix",
+                    "cloudUserName": "kasa_docker"
                 }
             }
         ],
@@ -16,6 +17,6 @@
     },
     "response": {
         "status": 200,
-        "bodyFileName": "get_device_list_response.json"
+        "bodyFileName": "v2_account_status_response.json"
     }
 }

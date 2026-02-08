@@ -1,0 +1,7 @@
+{
+    "error_code": 0,
+    "result": {
+        "accountStatus": 0,
+        "appServerUrl": "http://127.0.0.1:8080"
+    }
+}

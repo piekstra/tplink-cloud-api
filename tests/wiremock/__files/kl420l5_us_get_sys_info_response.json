@@ -1,0 +1,6 @@
+{
+    "error_code": 0,
+    "result": {
+        "responseData": "{\"system\": {\"get_sysinfo\": {\"sw_ver\": \"1.0.11 Build 210929 Rel.084339\", \"hw_ver\": \"1.0\", \"model\": \"KL420L5(US)\", \"deviceId\": \"D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1D4E50004\", \"oemId\": \"ABCD1234KL420001ABCD1234KL420001\", \"hwId\": \"1234ABCDKL420001ABCD1234KL420001\", \"rssi\": -45, \"longitude_i\": 1140579, \"latitude_i\": 225431, \"alias\": \"Living Room Strip\", \"status\": \"new\", \"mic_type\": \"IOT.SMARTBULB\", \"feature\": \"\", \"mac\": \"AA:BB:CC:DD:EE:04\", \"updating\": 0, \"led_off\": 0, \"is_dimmable\": 1, \"is_color\": 1, \"is_variable_color_temp\": 1, \"light_state\": {\"on_off\": 1, \"mode\": \"normal\", \"hue\": 240, \"saturation\": 100, \"color_temp\": 0, \"brightness\": 75}, \"dev_name\": \"Kasa Smart LED Light Strip\", \"err_code\": 0}}}"
+    }
+}
