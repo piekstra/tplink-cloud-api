@@ -5,7 +5,6 @@ from .device_client import TPLinkDeviceClient
 from .client import TPLinkApi
 from .exceptions import TPLinkTokenExpiredError
 
-# Supported devices
 from .hs100 import HS100
 from .hs103 import HS103
 from .hs105 import HS105
@@ -21,6 +20,23 @@ from .kp303 import KP303
 from .kp400 import KP400
 from .ep40 import EP40
 from .device import TPLinkDevice
+
+DEVICE_MODEL_MAP: dict[str, type[TPLinkDevice]] = {
+    'HS100': HS100,
+    'HS103': HS103,
+    'HS105': HS105,
+    'HS110': HS110,
+    'HS200': HS200,
+    'HS300': HS300,
+    'KL420L5': KL420L5,
+    'KL430': KL430,
+    'KP115': KP115,
+    'KP125': KP125,
+    'KP200': KP200,
+    'KP303': KP303,
+    'KP400': KP400,
+    'EP40': EP40,
+}
 
 
 class TPLinkDeviceManager:
@@ -96,9 +112,7 @@ class TPLinkDeviceManager:
         return devices
 
     def _construct_device(self, device_info):
-        # Construct the TPLinkDeviceInfo here for convenience
         tplink_device_info = TPLinkDeviceInfo(device_info)
-        # In case the app_server_url is different, we construct a client each time
         client = TPLinkDeviceClient(
             tplink_device_info.app_server_url,
             self._auth_token,
@@ -106,36 +120,11 @@ class TPLinkDeviceManager:
             term_id=self._term_id
         )
         model = tplink_device_info.device_model
-        if model.startswith('HS100'):
-            return HS100(client, tplink_device_info.device_id, tplink_device_info)
-        elif model.startswith('HS103'):
-            return HS103(client, tplink_device_info.device_id, tplink_device_info)
-        elif model.startswith('HS105'):
-            return HS105(client, tplink_device_info.device_id, tplink_device_info)
-        elif model.startswith('HS110'):
-            return HS110(client, tplink_device_info.device_id, tplink_device_info)
-        elif model.startswith('HS200'):
-            return HS200(client, tplink_device_info.device_id, tplink_device_info)
-        elif model.startswith('HS300'):
-            return HS300(client, tplink_device_info.device_id, tplink_device_info)
-        elif model.startswith('KL420L5'):
-            return KL420L5(client, tplink_device_info.device_id, tplink_device_info)
-        elif model.startswith('KL430'):
-            return KL430(client, tplink_device_info.device_id, tplink_device_info)
-        elif model.startswith('KP115'):
-            return KP115(client, tplink_device_info.device_id, tplink_device_info)
-        elif model.startswith('KP125'):
-            return KP125(client, tplink_device_info.device_id, tplink_device_info)
-        elif model.startswith('KP200'):
-            return KP200(client, tplink_device_info.device_id, tplink_device_info)
-        elif model.startswith('KP303'):
-            return KP303(client, tplink_device_info.device_id, tplink_device_info)
-        elif model.startswith('KP400'):
-            return KP400(client, tplink_device_info.device_id, tplink_device_info)
-        elif model.startswith('EP40'):
-            return EP40(client, tplink_device_info.device_id, tplink_device_info)
-        else:
-            return TPLinkDevice(client, tplink_device_info.device_id, tplink_device_info)
+        device_cls = next(
+            (cls for prefix, cls in DEVICE_MODEL_MAP.items() if model.startswith(prefix)),
+            TPLinkDevice,
+        )
+        return device_cls(client, tplink_device_info.device_id, tplink_device_info)
 
     def login(self, username, password, mfa_callback=None):
         result = self._tplink_api.login(
