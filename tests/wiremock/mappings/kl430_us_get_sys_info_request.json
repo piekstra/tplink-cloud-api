@@ -5,7 +5,11 @@
         "bodyPatterns": [
             {
                 "equalToJson": {
-                    "method": "getDeviceList"
+                    "method": "passthrough",
+                    "params": {
+                        "deviceId": "140BED90F6EF82191649329403A40C66528411D2",
+                        "requestData": "{\"system\": {\"get_sysinfo\": null}}"
+                    }
                 }
             }
         ],
@@ -16,6 +20,6 @@
     },
     "response": {
         "status": 200,
-        "bodyFileName": "get_device_list_response.json"
+        "bodyFileName": "kl430_us_get_sys_info_response.json"
     }
 }

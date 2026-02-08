@@ -1,0 +1,6 @@
+{
+    "error_code": 0,
+    "result": {
+        "responseData": "{\"system\": {\"get_sysinfo\": {\"sw_ver\": \"1.0.8 Build 210121 Rel.084339\", \"hw_ver\": \"2.0\", \"model\": \"KL430(US)\", \"deviceId\": \"140BED90F6EF82191649329403A40C66528411D2\", \"oemId\": \"8BB9A4E25D621BC7163EEF9CDDE2E37C\", \"hwId\": \"6E2F6FA0EEE2CC63C8E1CA1C90698437\", \"rssi\": -38, \"longitude_i\": 1140579, \"latitude_i\": 225431, \"alias\": \"Test Strip\", \"status\": \"new\", \"mic_type\": \"IOT.SMARTBULB\", \"feature\": \"\", \"mac\": \"7B:2A:CF:4A:E0:2B\", \"updating\": 0, \"led_off\": 0, \"is_dimmable\": 1, \"is_color\": 1, \"is_variable_color_temp\": 1, \"light_state\": {\"on_off\": 0, \"mode\": \"normal\", \"hue\": 0, \"saturation\": 0, \"color_temp\": 2700, \"brightness\": 50}, \"dev_name\": \"Kasa Smart Light Strip, Multicolor\", \"err_code\": 0}}}"
+    }
+}

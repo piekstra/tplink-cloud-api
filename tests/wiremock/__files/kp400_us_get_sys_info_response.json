@@ -1,0 +1,6 @@
+{
+    "error_code": 0,
+    "result": {
+        "responseData": "{\"system\": {\"get_sysinfo\": {\"sw_ver\": \"1.0.5 Build 210121 Rel.084339\", \"hw_ver\": \"1.0\", \"model\": \"KP400(US)\", \"deviceId\": \"C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6C3D40003\", \"oemId\": \"ABCD1234KP400001ABCD1234KP400001\", \"hwId\": \"1234ABCDKP400001ABCD1234KP400001\", \"rssi\": -40, \"longitude_i\": 1140579, \"latitude_i\": 225431, \"alias\": \"Backyard Plug\", \"status\": \"new\", \"mic_type\": \"IOT.SMARTPLUGSWITCH\", \"feature\": \"TIM\", \"mac\": \"AA:BB:CC:DD:EE:03\", \"updating\": 0, \"led_off\": 0, \"children\": [{\"id\": \"C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6C3D4000300\", \"state\": 0, \"alias\": \"Garden Lights\", \"on_time\": 0, \"next_action\": {\"type\": -1}}, {\"id\": \"C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6C3D4000301\", \"state\": 1, \"alias\": \"Pool Pump\", \"on_time\": 7200, \"next_action\": {\"type\": -1}}], \"child_num\": 2, \"err_code\": 0}}}"
+    }
+}

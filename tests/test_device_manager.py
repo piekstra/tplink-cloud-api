@@ -25,8 +25,10 @@ class TestGetDevices(object):
     async def test_gets_devices(self, client):
         device_list = await client.get_devices()
         assert device_list is not None
-        # 5 devices but the 5th one has 6 children
-        assert len(device_list) == 11
+        # 9 devices: HS103, HS105, HS110, HS300 (6 children), KL430,
+        #            HS200, KP200 (2 children), KP400 (2 children), KL420L5
+        # Total: 9 parents + 6 + 2 + 2 children = 19
+        assert len(device_list) == 19
 
 @pytest.mark.usefixtures('client')
 class TestFindDevice(object):
@@ -58,7 +60,6 @@ class TestFindDevice(object):
         assert device.device_info.is_same_region is True
         assert device.device_info.status == 1
         assert device.child_id is None
-        # We can cheat a little with knowledge that this is an enum
         assert device.model_type is not None
         assert device.model_type.name == 'HS103'
 
@@ -89,7 +90,6 @@ class TestFindDevice(object):
         assert device.device_info.is_same_region is True
         assert device.device_info.status == 1
         assert device.child_id is None
-        # We can cheat a little with knowledge that this is an enum
         assert device.model_type is not None
         assert device.model_type.name == 'HS105'
 
@@ -120,7 +120,6 @@ class TestFindDevice(object):
         assert device.device_info.is_same_region is True
         assert device.device_info.status == 1
         assert device.child_id is None
-        # We can cheat a little with knowledge that this is an enum
         assert device.model_type is not None
         assert device.model_type.name == 'HS110'
 
@@ -151,12 +150,11 @@ class TestFindDevice(object):
         assert device.device_info.is_same_region is True
         assert device.device_info.status == 1
         assert device.child_id is None
-        # We can cheat a little with knowledge that this is an enum
         assert device.model_type is not None
         assert device.model_type.name == 'HS300'
 
     @pytest.mark.asyncio
-    async def test_finds_unknown_us_device(self, client):
+    async def test_finds_kl430_us_device(self, client):
         device_name = 'Test Strip'
         device_id = '140BED90F6EF82191649329403A40C66528411D2'
         device = await client.find_device(device_name)
@@ -182,9 +180,76 @@ class TestFindDevice(object):
         assert device.device_info.is_same_region is True
         assert device.device_info.status == 1
         assert device.child_id is None
-        # We can cheat a little with knowledge that this is an enum
         assert device.model_type is not None
-        assert device.model_type.name == 'UNKNOWN'
+        assert device.model_type.name == 'KL430'
+
+    @pytest.mark.asyncio
+    async def test_finds_hs200_us_device(self, client):
+        device_name = 'Kitchen Light Switch'
+        device_id = 'A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4A1B20001'
+        device = await client.find_device(device_name)
+
+        assert device is not None
+        assert device.get_alias() == device_name
+        assert device.device_id == device_id
+        assert device.device_info.device_model == 'HS200(US)'
+        assert device.model_type.name == 'HS200'
+
+    @pytest.mark.asyncio
+    async def test_finds_kp200_us_device(self, client):
+        device_name = 'Front Porch Plug'
+        device_id = 'B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5B2C30002'
+        device = await client.find_device(device_name)
+
+        assert device is not None
+        assert device.get_alias() == device_name
+        assert device.device_id == device_id
+        assert device.device_info.device_model == 'KP200(US)'
+        assert device.model_type.name == 'KP200'
+        assert device.has_children() is True
+
+    @pytest.mark.asyncio
+    async def test_finds_kp200_child_device(self, client):
+        device_name = 'Porch Light'
+        device = await client.find_device(device_name)
+
+        assert device is not None
+        assert device.get_alias() == device_name
+        assert device.model_type.name == 'KP200CHILD'
+
+    @pytest.mark.asyncio
+    async def test_finds_kp400_us_device(self, client):
+        device_name = 'Backyard Plug'
+        device_id = 'C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6C3D40003'
+        device = await client.find_device(device_name)
+
+        assert device is not None
+        assert device.get_alias() == device_name
+        assert device.device_id == device_id
+        assert device.device_info.device_model == 'KP400(US)'
+        assert device.model_type.name == 'KP400'
+        assert device.has_children() is True
+
+    @pytest.mark.asyncio
+    async def test_finds_kp400_child_device(self, client):
+        device_name = 'Garden Lights'
+        device = await client.find_device(device_name)
+
+        assert device is not None
+        assert device.get_alias() == device_name
+        assert device.model_type.name == 'KP400CHILD'
+
+    @pytest.mark.asyncio
+    async def test_finds_kl420l5_us_device(self, client):
+        device_name = 'Living Room Strip'
+        device_id = 'D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1D4E50004'
+        device = await client.find_device(device_name)
+
+        assert device is not None
+        assert device.get_alias() == device_name
+        assert device.device_id == device_id
+        assert device.device_info.device_model == 'KL420L5(US)'
+        assert device.model_type.name == 'KL420L5'
 
 
 @pytest.mark.usefixtures('client')
