@@ -1,18 +1,27 @@
 # tplink-cloud-api
-A Python library to remotely control TP-Link smart home devices using their cloud service - no need to be on the same network as your devices
 
-This started as a Python port of Adumont's Node.js module:
-https://github.com/adumont/tplink-cloud-api
+Control TP-Link Kasa smart home devices from anywhere over the internet using TP-Link's cloud API — no local network access required.
 
-# Introduction
+## Why cloud control?
 
-The `tplinkcloud` Python module allows you to remotely control your TP-Link Kasa smart home devices (smart plugs, switches, power strips, and light strips) using the TP-Link cloud web service, from anywhere, without the need to be on the same wifi/lan.
+Most TP-Link/Kasa Python libraries (like [python-kasa](https://github.com/python-kasa/python-kasa)) communicate with devices over your **local network**. That works great when your code runs at home, but not when it runs somewhere else.
 
-It uses the **V2 TP-Link Cloud API** with HMAC-SHA1 request signing, and supports MFA (two-factor authentication) and refresh token-based session management.
+This library uses the **TP-Link Cloud API** instead, so your code can control devices from anywhere with an internet connection. That makes it the right choice for:
 
-It's especially useful in scenarios where you want to control your devices from public web services, like [IFTTT](https://ifttt.com/), [Thinger.io](https://thinger.io/), Tasker (Android), or your own scripts and automations.
+- **Server-side automations** — cloud functions, cron jobs, CI pipelines
+- **Web service integrations** — [IFTTT](https://ifttt.com/), [Thinger.io](https://thinger.io/), webhooks
+- **Mobile scripting** — Tasker (Android), Shortcuts (iOS)
+- **Remote access** — control devices while you're away from home
 
-# Device Compatibility
+If you just need local control on the same network as your devices, [python-kasa](https://github.com/python-kasa/python-kasa) is a great option with broader device support.
+
+## How it works
+
+The library authenticates with your TP-Link / Kasa account credentials using the **V2 TP-Link Cloud API** with HMAC-SHA1 request signing. It supports MFA (two-factor authentication) and automatic refresh token management.
+
+Originally a Python port of [Adumont's Node.js module](https://github.com/adumont/tplink-cloud-api).
+
+## Device Compatibility
 
 The following devices are _officially_ supported by the library at this time:
 
@@ -42,11 +51,11 @@ The following devices are _officially_ supported by the library at this time:
 
 Devices not explicitly listed above will still work with basic on/off functionality through the generic `TPLinkDevice` class.
 
-# Requirements
+## Requirements
 
 * Python 3.10+
 
-# Installation
+## Installation
 
 The package is available via PyPi and can be installed with the following command:
 ```
@@ -66,9 +75,9 @@ You can install this library with `pip`:
 pip3 install .
 ```
 
-# Usage
+## Usage
 
-## Authenticate
+### Authenticate
 
 Instantiating a `TPLinkDeviceManager` automatically logs in with your TP-Link / Kasa credentials using the V2 API, caches the login token, and fetches your devices.
 
@@ -83,7 +92,7 @@ device_manager = TPLinkDeviceManager(username, password)
 
 > Note that the device manager can also be constructed using `await` if desired and running in an `async` context
 
-### MFA (Two-Factor Authentication)
+#### MFA (Two-Factor Authentication)
 
 If your TP-Link account has two-factor authentication enabled, you can provide an `mfa_callback` function that will be called when MFA verification is needed:
 
@@ -99,7 +108,7 @@ device_manager = TPLinkDeviceManager(
 )
 ```
 
-### Token Management
+#### Token Management
 
 The library automatically handles refresh tokens. You can also manually manage tokens for session persistence:
 
@@ -114,7 +123,7 @@ device_manager.set_auth_token(token)
 device_manager.set_refresh_token(refresh_token)
 ```
 
-### Error Handling
+#### Error Handling
 
 The library provides specific exception classes for common error scenarios:
 
@@ -137,7 +146,7 @@ except TPLinkCloudError as e:
     print(f'API error: {e} (code: {e.error_code})')
 ```
 
-## Async Context
+### Async Context
 
 In order to run the async methods, you will need an async context. For a simple Python script, you can simply use the following:
 
@@ -176,7 +185,7 @@ async def fetch_all_devices_sys_info():
 asyncio.run(fetch_all_devices_sys_info())
 ```
 
-## Retrieve devices
+### Retrieve devices
 
 To view your devices, you can run the following:
 
@@ -188,9 +197,9 @@ if devices:
     print(f'{device.model_type.name} device called {device.get_alias()}')
 ```
 
-## Control your devices
+### Control your devices
 
-### Smart Power Strips (HS300, KP303)
+#### Smart Power Strips (HS300, KP303)
 
 Toggle a plug:
 
@@ -226,11 +235,11 @@ if devices:
     print(f'{device.model_type.name} device called {device.get_alias()}')
 ```
 
-### Smart Plugs (HS100, HS103, HS105, HS110, KP115, KP125, EP40)
+#### Smart Plugs (HS100, HS103, HS105, HS110, KP115, KP125, EP40)
 
 These have the same functionality as the Smart Power Strips, though the HS100, HS103, and HS105 do not have the power usage features.
 
-### Smart Outdoor Plugs (KP200, KP400)
+#### Smart Outdoor Plugs (KP200, KP400)
 
 Multi-outlet outdoor plugs. Each outlet is exposed as a child device that can be controlled independently:
 
@@ -247,7 +256,7 @@ for device in devices:
     await device.toggle()
 ```
 
-### Smart Light Strips (KL420L5, KL430)
+#### Smart Light Strips (KL420L5, KL430)
 
 Light strips support color and brightness control:
 
@@ -267,7 +276,7 @@ await device.set_color(hue=240, saturation=100, brightness=80)
 await device.set_color_temp(4000)
 ```
 
-### Smart Switches (HS200)
+#### Smart Switches (HS200)
 
 Smart switches have the same on/off functionality as smart plugs:
 
@@ -276,7 +285,7 @@ device = await device_manager.find_device("Kitchen Light Switch")
 await device.toggle()
 ```
 
-## Add and modify schedule rules for your devices
+### Add and modify schedule rules for your devices
 
 Edit an existing schedule rule
 
@@ -336,11 +345,11 @@ else:
   print(f'Could not find {device_name}')
 ```
 
-## Testing
+### Testing
 
 This project leverages `wiremock` to test the code to some extent. Note this will not protect the project from changes that TP-Link makes to their API, but instead verifies that the existing code functions consistently as written.
 
-### Local Testing
+#### Local Testing
 
 Note that the tests setup leverages the [`local_env_vars.py`](tests/local_env_vars.py) file. The values for those environment variables need to be set based on the following:
 
@@ -361,6 +370,6 @@ Then, you can run the actual tests with the following command:
 pytest --verbose
 ```
 
-### GitHub Testing
+#### GitHub Testing
 
 This project leverages GitHub Actions and has a [workflow](.github/workflows/python-package.yml) that will run these tests. The environment configuration for the tests must have parity with the [`local_env_vars.py`](tests/local_env_vars.py) file from the [local testing](#local-testing).
