@@ -6,24 +6,49 @@ https://github.com/adumont/tplink-cloud-api
 
 # Introduction
 
-The `tplinkcloud` Python module allows you to remotely control your TP-Link smartplugs (HS100, HS103, HS105, HS110, HS300, KP115) using the TP-Link cloud web service, from anywhere, without the need to be on the same wifi/lan.
+The `tplinkcloud` Python module allows you to remotely control your TP-Link Kasa smart home devices (smart plugs, switches, power strips, and light strips) using the TP-Link cloud web service, from anywhere, without the need to be on the same wifi/lan.
 
-It's especially useful in scenarios where you want to control your devices from public web services, like [IFTTT](https://ifttt.com/), [Thinger.io](https://thinger.io/), [Webtask.io](https://webtask.io/), [Glitch.com](http://glitch.com/), Tasker (Android)...
+It uses the **V2 TP-Link Cloud API** with HMAC-SHA1 request signing, and supports MFA (two-factor authentication) and refresh token-based session management.
+
+It's especially useful in scenarios where you want to control your devices from public web services, like [IFTTT](https://ifttt.com/), [Thinger.io](https://thinger.io/), Tasker (Android), or your own scripts and automations.
 
 # Device Compatibility
 
 The following devices are _officially_ supported by the library at this time:
+
+**Smart Plugs**
+* HS100 (Smart Plug - Blocks two outlets as a single outlet)
+* HS103 (Smart Plug Lite - 12 Amp)
+* HS105 (Smart Plug Mini - 15 Amp)
+* HS110 (Smart Plug with Energy Monitoring)
+* KP115 (Smart Plug with Energy Monitoring - 15 Amp; replacement for HS110)
+* KP125 (Smart Plug Mini with Energy Monitoring)
+* EP40 (Outdoor Smart Plug)
+
+**Smart Switches**
+* HS200 (Smart Light Switch)
+
+**Smart Power Strips**
 * HS300 (Smart Plug Power Strip with 6 Smart Outlets)
-* HS100 (Older Smart Plug - Blocks two outlets as a single outlet)
-* HS103 (Smaller Single-Socket Smart Plug - 12 Amp)
-* HS105 (Smaller Single-Socket Smart Plug - 15 Amp)
-* HS110 (Older Smart Plug - Blocks two outlets as a single outlet)
-* KP115 (Small Single-Socket Smart Plug - 15 Amp; replacement for HS110)
 * KP303 (Smart Plug Power Strip with 3 Outlets)
+
+**Smart Outdoor Plugs (Multi-Outlet)**
+* KP200 (Smart Outdoor Plug with 2 Outlets)
+* KP400 (Smart Outdoor Plug with 2 Outlets)
+
+**Smart Light Strips**
+* KL420L5 (Smart LED Light Strip)
+* KL430 (Smart Light Strip, Multicolor)
+
+Devices not explicitly listed above will still work with basic on/off functionality through the generic `TPLinkDevice` class.
+
+# Requirements
+
+* Python 3.10+
 
 # Installation
 
-The package is availble via PyPi and can be installed with the following command:
+The package is available via PyPi and can be installed with the following command:
 ```
 pip3 install tplink-cloud-api
 ```
@@ -45,18 +70,72 @@ pip3 install .
 
 ## Authenticate
 
-Instantiating a TP Link Device Manager automatically logs in with your TP-Link credentials, caches the login token, and fetches your devices. The current TP-Link Cloud API Url (https://wap.tplinkcloud.com) is assumed if not provided explicitly.
+Instantiating a `TPLinkDeviceManager` automatically logs in with your TP-Link / Kasa credentials using the V2 API, caches the login token, and fetches your devices.
 
 ```python
 from tplinkcloud import TPLinkDeviceManager
 
-username='kasa@email.com'
-password='secure'
+username = 'kasa@email.com'
+password = 'secure'
 
 device_manager = TPLinkDeviceManager(username, password)
 ```
 
 > Note that the device manager can also be constructed using `await` if desired and running in an `async` context
+
+### MFA (Two-Factor Authentication)
+
+If your TP-Link account has two-factor authentication enabled, you can provide an `mfa_callback` function that will be called when MFA verification is needed:
+
+```python
+def handle_mfa(mfa_type, email):
+    """Called when MFA is required. Returns the verification code."""
+    return input(f'Enter the MFA code sent to {email}: ')
+
+device_manager = TPLinkDeviceManager(
+    username='kasa@email.com',
+    password='secure',
+    mfa_callback=handle_mfa,
+)
+```
+
+### Token Management
+
+The library automatically handles refresh tokens. You can also manually manage tokens for session persistence:
+
+```python
+# Get tokens for later use
+token = device_manager.get_token()
+refresh_token = device_manager.get_refresh_token()
+
+# Resume a session without re-authenticating
+device_manager = TPLinkDeviceManager(prefetch=False)
+device_manager.set_auth_token(token)
+device_manager.set_refresh_token(refresh_token)
+```
+
+### Error Handling
+
+The library provides specific exception classes for common error scenarios:
+
+```python
+from tplinkcloud import (
+    TPLinkDeviceManager,
+    TPLinkAuthError,
+    TPLinkMFARequiredError,
+    TPLinkTokenExpiredError,
+    TPLinkCloudError,
+)
+
+try:
+    device_manager = TPLinkDeviceManager(username, password)
+except TPLinkAuthError:
+    print('Wrong username or password')
+except TPLinkMFARequiredError as e:
+    print(f'MFA required (type: {e.mfa_type}), provide an mfa_callback')
+except TPLinkCloudError as e:
+    print(f'API error: {e} (code: {e.error_code})')
+```
 
 ## Async Context
 
@@ -121,7 +200,7 @@ device = await device_manager.find_device(device_name)
 if device:
   print(f'Found {device.model_type.name} device: {device.get_alias()}')
   await device.toggle()
-else:  
+else:
   print(f'Could not find {device_name}')
 ```
 
@@ -147,9 +226,55 @@ if devices:
     print(f'{device.model_type.name} device called {device.get_alias()}')
 ```
 
-### Smart Plugs (Not Power Strips) (HS100, HS103, HS105, HS110, KP115)
+### Smart Plugs (HS100, HS103, HS105, HS110, KP115, KP125, EP40)
 
-These have the same functionality as the Smart Power Strips, though the HS100, HS103 and HS105 do not have the power usage features.
+These have the same functionality as the Smart Power Strips, though the HS100, HS103, and HS105 do not have the power usage features.
+
+### Smart Outdoor Plugs (KP200, KP400)
+
+Multi-outlet outdoor plugs. Each outlet is exposed as a child device that can be controlled independently:
+
+```python
+# Control the parent device (affects all outlets)
+device = await device_manager.find_device("Backyard Plug")
+await device.power_on()
+
+# Child devices are returned by get_devices() alongside parents
+devices = await device_manager.get_devices()
+for device in devices:
+  if 'KP400CHILD' in device.model_type.name:
+    print(f'Outlet: {device.get_alias()}')
+    await device.toggle()
+```
+
+### Smart Light Strips (KL420L5, KL430)
+
+Light strips support color and brightness control:
+
+```python
+device = await device_manager.find_device("Living Room Strip")
+
+# Basic on/off
+await device.power_on()
+
+# Set brightness (0-100)
+await device.set_brightness(75)
+
+# Set color (hue: 0-360, saturation: 0-100, brightness: 0-100)
+await device.set_color(hue=240, saturation=100, brightness=80)
+
+# Set color temperature (2500-9000 Kelvin)
+await device.set_color_temp(4000)
+```
+
+### Smart Switches (HS200)
+
+Smart switches have the same on/off functionality as smart plugs:
+
+```python
+device = await device_manager.find_device("Kitchen Light Switch")
+await device.toggle()
+```
 
 ## Add and modify schedule rules for your devices
 
@@ -169,7 +294,7 @@ if device:
       False
   )
   await device.edit_schedule_rule(rule_edit.to_json())
-else:  
+else:
   print(f'Could not find {device_name}')
 ```
 
@@ -192,7 +317,7 @@ if device:
       [0, 0, 0, 0, 0, 1, 1]
   ).build()
   await device.add_schedule_rule(new_rule.to_json())
-else:  
+else:
   print(f'Could not find {device_name}')
 ```
 
@@ -207,7 +332,7 @@ if device:
   schedule = await device.get_schedule_rules()
   rule = schedule.rules[0]
   await device.delete_schedule_rule(rule.id)
-else:  
+else:
   print(f'Could not find {device_name}')
 ```
 
@@ -215,19 +340,19 @@ else:
 
 This project leverages `wiremock` to test the code to some extent. Note this will not protect the project from changes that TP-Link makes to their API, but instead verifies that the existing code functions consistently as written.
 
-### Local Testing 
+### Local Testing
 
 Note that the tests setup leverages the [`local_env_vars.py`](tests/local_env_vars.py) file. The values for those environment variables need to be set based on the following:
 
-* `TPLINK_KASA_USERNAME`: `kasa_docker` - This must have parity with the `login` `body` specified in [`tests/wiremock/mappings/login_request.json`](tests/wiremock/mappings/login_request.json)
-* `TPLINK_KASA_PASSWORD`: `kasa_password` - This must have parity with the `login` `body` specified in [`tests/wiremock/mappings/login_request.json`](tests/wiremock/mappings/login_request.json)
-* `TPLINK_KASA_TERM_ID`: `2a8ced52-f200-4b79-a1fe-2f6b58193c4c` - This must be a UUID V4 string and must have parity with the `login` `body` specified in [`tests/wiremock/mappings/login_request.json`](tests/wiremock/mappings/login_request.json). It must also match the `termID` query parameter in all mocked requests found [here](tests/wiremock/mappings)
-* `TPLINK_KASA_API_URL`: `http://127.0.0.1:8080` - This URL is simply `http://127.0.0.1` but the url port must have parity with the [`docker-compose.yaml`](docker-compose.yaml) wiremock service's exposed http `port`. 
+* `TPLINK_KASA_USERNAME`: `kasa_docker` - This must have parity with the V2 login `body` specified in [`tests/wiremock/mappings/v2_login_request.json`](tests/wiremock/mappings/v2_login_request.json)
+* `TPLINK_KASA_PASSWORD`: `kasa_password` - This must have parity with the V2 login `body` specified in [`tests/wiremock/mappings/v2_login_request.json`](tests/wiremock/mappings/v2_login_request.json)
+* `TPLINK_KASA_TERM_ID`: `2a8ced52-f200-4b79-a1fe-2f6b58193c4c` - This must be a UUID V4 string and must have parity with the V2 login `body` specified in [`tests/wiremock/mappings/v2_login_request.json`](tests/wiremock/mappings/v2_login_request.json)
+* `TPLINK_KASA_API_URL`: `http://127.0.0.1:8080` - This URL is simply `http://127.0.0.1` but the url port must have parity with the [`docker-compose.yaml`](docker-compose.yaml) wiremock service's exposed http `port`.
 
 To run tests, you will first need to start the wiremock service by running:
 
 ```
-docker-compose up -d
+docker compose up -d
 ```
 
 Then, you can run the actual tests with the following command:
