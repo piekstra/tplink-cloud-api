@@ -1,0 +1,3 @@
+name: python
+description: Review agents for Python implementation quality, idioms, and behavioral test coverage.
+owner: piekstra

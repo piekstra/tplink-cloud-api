@@ -1,0 +1,15 @@
+name: implementation
+description: Reviews Python changes for idiomatic implementation, correctness, resource and error handling, and tests that prove the changed behavior.
+model_tier: medium
+effort: medium
+file_globs:
+  - "**/*.py"
+  - "**/*.pyi"
+  - "pyproject.toml"
+  - "setup.py"
+  - "setup.cfg"
+  - "requirements*.txt"
+applies_when:
+  - A change touches Python implementation, CLI or API surface, dependencies, or behavior that should be proven by tests.
+  - Do not select for test-only changes unless the diff alters an error-handling, resource-management, or concurrency pattern, or for concerns owned by a dedicated policy or structure reviewer.
+needs_full_file_content: false
