@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Local exploration / probe scripts that may contain real credentials
+tplink.py
+
+# Decompiled Tether source — license + size; do not commit
+tether-src/
