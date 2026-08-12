@@ -1,7 +1,11 @@
 from .device_type import TPLinkDeviceType
 from .device import TPLinkDevice
 
-_LIGHTING_SERVICE = 'smartlife.iot.smartbulb.lightingservice'
+# The KL42x/KL43x light strips do not support the smartbulb lighting
+# service (err_code -2001 'module not support'); they use the
+# lightStrip module with set_light_state. Verified against a live
+# KL420L5(US).
+_LIGHTING_SERVICE = 'smartlife.iot.lightStrip'
 
 
 class KL420L5LightState:
@@ -79,7 +83,7 @@ class KL420L5(TPLinkDevice):
         if transition_period is not None:
             state['transition_period'] = transition_period
         return await self._pass_through_request(
-            _LIGHTING_SERVICE, 'transition_light_state', state)
+            _LIGHTING_SERVICE, 'set_light_state', state)
 
     async def power_on(self):
         return await self.set_light_state(on_off=1)
