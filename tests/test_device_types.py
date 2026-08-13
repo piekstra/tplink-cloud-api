@@ -130,8 +130,8 @@ class TestKL420L5:
         with patch.object(device, '_pass_through_request', new_callable=AsyncMock) as mock:
             await device.power_on()
             mock.assert_called_once_with(
-                'smartlife.iot.smartbulb.lightingservice',
-                'transition_light_state',
+                'smartlife.iot.lightStrip',
+                'set_light_state',
                 {'on_off': 1}
             )
 
@@ -143,8 +143,8 @@ class TestKL420L5:
         with patch.object(device, '_pass_through_request', new_callable=AsyncMock) as mock:
             await device.set_color(hue=240, saturation=100, brightness=75)
             mock.assert_called_once_with(
-                'smartlife.iot.smartbulb.lightingservice',
-                'transition_light_state',
+                'smartlife.iot.lightStrip',
+                'set_light_state',
                 {'on_off': 1, 'hue': 240, 'saturation': 100,
                  'color_temp': 0, 'brightness': 75}
             )
@@ -157,8 +157,8 @@ class TestKL420L5:
         with patch.object(device, '_pass_through_request', new_callable=AsyncMock) as mock:
             await device.set_color_temp(color_temp=4000)
             mock.assert_called_once_with(
-                'smartlife.iot.smartbulb.lightingservice',
-                'transition_light_state',
+                'smartlife.iot.lightStrip',
+                'set_light_state',
                 {'on_off': 1, 'color_temp': 4000}
             )
 
@@ -188,8 +188,8 @@ class TestKL430:
         with patch.object(device, '_pass_through_request', new_callable=AsyncMock) as mock:
             await device.set_brightness(50)
             mock.assert_called_once_with(
-                'smartlife.iot.smartbulb.lightingservice',
-                'transition_light_state',
+                'smartlife.iot.lightStrip',
+                'set_light_state',
                 {'on_off': 1, 'brightness': 50}
             )
 
