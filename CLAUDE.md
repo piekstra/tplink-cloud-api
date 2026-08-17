@@ -59,16 +59,28 @@ Set `include_tapo=False` on `TPLinkDeviceManager` to disable Tapo cloud support.
 - **Power strips**: `HS300`, `KP303` — parent + child devices per outlet
 - **Outdoor plugs**: `KP200`, `KP400` — parent + child devices per outlet, `EP40` — single outlet
 - **Light strips**: `KL420L5`, `KL430` — color, brightness, color temp via `smartlife.iot.smartbulb.lightingservice`
+- **Routers** (Archer family, both wireless and xDSL modem-router): `Router` — metadata-only class. Cloud control of router *operations* is not possible via this library; the cloud relay rejects every JSON method (`-20103`) for router-typed devices because routers speak the proprietary TMP binary protocol. The class surfaces alias/model/MAC/firmware/hardware/region/online-status/V2-URL and raises `NotImplementedError` on plug-style action methods. See `docs/superpowers/router-api/discovery-findings.md` for the empirical evidence and reasoning.
 
 Devices with multiple outlets (`HS300`, `KP303`, `KP200`, `KP400`) have `has_children() -> True`. Child devices are separate class instances (e.g., `HS300Child`) with a `child_id`.
 
+### Device dispatch in `_construct_device`
+
+Two-tier:
+
+1. **`device_type`-first** (router shortcut): if the cloud returns `deviceType` `WIRELESSROUTER` or `XDSLMODEMROUTER`, instantiate `Router` directly. Used for devices where model-name disambiguation is unnecessary because every router goes to the same metadata-only class.
+2. **Model-prefix dispatch** (everything else): walk `DEVICE_MODEL_MAP` looking for a model-name prefix match (`HS103`, `KL430`, etc.). Fall back to base `TPLinkDevice` if no prefix matches.
+
 ### Adding a new device
+
+For a plug/switch/light/strip:
 
 1. Create `tplinkcloud/<model>.py` extending `TPLinkDevice` (or `EmeterDevice` for energy monitoring)
 2. Define the `DeviceType` enum value in `device_type.py`
-3. Add the model mapping in `device_manager.py` `_construct_device()`
+3. Add the model mapping in `device_manager.py` `DEVICE_MODEL_MAP`
 4. Add wiremock stubs in `tests/wiremock/mappings/` and `tests/wiremock/__files/`
 5. Add tests in `tests/test_device_manager.py`
+
+For a new router-family `deviceType` (e.g., a mesh node) that should also use the metadata-only `Router` class: add the new `deviceType` string to the tuple in `_construct_device`'s router check and add a wiremock fixture entry; no new file needed.
 
 ## Controlling devices
 

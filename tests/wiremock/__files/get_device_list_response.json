@@ -163,6 +163,44 @@
                 "fwId": "00000000000000000000000000000000",
                 "isSameRegion": true,
                 "status": 1
+            },
+            {
+                "deviceType": "WIRELESSROUTER",
+                "role": 0,
+                "fwVer": "1.6.2 Build 20260119 rel.87654",
+                "appServerUrl": "http://127.0.0.1:8080",
+                "appServerUrlV2": "http://127.0.0.1:8080",
+                "deviceRegion": "us-east-1",
+                "deviceId": "E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1B2E5F60005",
+                "deviceName": "Archer AX53",
+                "deviceHwVer": "1.0",
+                "alias": "Archer AX53",
+                "deviceMac": "AABBCCDDEEE5",
+                "oemId": "ARCHER_AX53_OEM_ID_PLACEHOLDER0001",
+                "deviceModel": "Archer AX53(EU)",
+                "hwId": "ARCHER_AX53_HW_ID_PLACEHOLDER00001",
+                "fwId": "00000000000000000000000000000000",
+                "isSameRegion": true,
+                "status": 1
+            },
+            {
+                "deviceType": "XDSLMODEMROUTER",
+                "role": 0,
+                "fwVer": "1.5.0 0.9.1 v00a1.0 Build 220321 Rel.60385n",
+                "appServerUrl": "http://127.0.0.1:8080",
+                "appServerUrlV2": "http://127.0.0.1:8080",
+                "deviceRegion": "us-east-1",
+                "deviceId": "F6A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3F6A10006",
+                "deviceName": "Archer VR400",
+                "deviceHwVer": "3.0",
+                "alias": "Archer VR400",
+                "deviceMac": "AABBCCDDEEE6",
+                "oemId": "ARCHER_VR400_OEM_ID_PLACEHOLDER0002",
+                "deviceModel": "Archer VR400(EU)",
+                "hwId": "ARCHER_VR400_HW_ID_PLACEHOLDER0002",
+                "fwId": "00000000000000000000000000000000",
+                "isSameRegion": true,
+                "status": 0
             }
         ]
     }

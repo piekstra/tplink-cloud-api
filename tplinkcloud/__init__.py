@@ -8,11 +8,13 @@ from .exceptions import (
     TPLinkMFARequiredError,
     TPLinkTokenExpiredError,
 )
+from .router import Router
 
 __all__ = [
     'TPLinkDeviceManager',
     'TPLinkDeviceManagerPowerTools',
     'TPLinkDeviceScheduleRuleBuilder',
+    'Router',
     'TPLinkAuthError',
     'TPLinkCloudError',
     'TPLinkDeviceOfflineError',

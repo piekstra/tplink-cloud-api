@@ -19,6 +19,7 @@ from .kp200 import KP200
 from .kp303 import KP303
 from .kp400 import KP400
 from .ep40 import EP40
+from .router import Router
 from .device import TPLinkDevice
 
 DEVICE_MODEL_MAP: dict[str, type[TPLinkDevice]] = {
@@ -195,12 +196,15 @@ class TPLinkDeviceManager:
             app_name=api._app_name,
             cloud_type=cloud_type,
         )
-        model = tplink_device_info.device_model
-        device_cls = next(
-            (cls for prefix, cls in DEVICE_MODEL_MAP.items() if model.startswith(prefix)),
-            TPLinkDevice,
-        )
-        device = device_cls(client, tplink_device_info.device_id, tplink_device_info)
+        if tplink_device_info.device_type in ('WIRELESSROUTER', 'XDSLMODEMROUTER'):
+            device = Router(client, tplink_device_info.device_id, tplink_device_info)
+        else:
+            model = tplink_device_info.device_model
+            device_cls = next(
+                (cls for prefix, cls in DEVICE_MODEL_MAP.items() if model.startswith(prefix)),
+                TPLinkDevice,
+            )
+            device = device_cls(client, tplink_device_info.device_id, tplink_device_info)
         device.cloud_type = cloud_type
         return device
 
