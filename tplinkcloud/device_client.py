@@ -4,6 +4,7 @@ import uuid
 
 from .api_response import TPLinkApiResponse
 from .certs import get_ca_cert_path
+from .redaction import redact
 from .signing import KASA_ACCESS_KEY, KASA_SECRET_KEY, get_signing_headers
 import ssl
 
@@ -42,7 +43,7 @@ class TPLinkDeviceClient:
 
     async def _request_post(self, body, url_path="/"):
         if self._verbose:
-            print('POST', self.host + url_path, body)
+            print('POST', self.host + url_path, redact(body))
 
         body_json = json.dumps(body)
 
@@ -67,7 +68,7 @@ class TPLinkDeviceClient:
                 if response.status == 200:
                     response_json = await response.json(content_type=None)
                     if self._verbose:
-                        print(json.dumps(response_json, indent=2))
+                        print(json.dumps(redact(response_json), indent=2))
                     return TPLinkApiResponse(response_json)
                 elif response.content:
                     raise Exception(str(response.status) + ': ' +
