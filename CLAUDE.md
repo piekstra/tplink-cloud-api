@@ -47,6 +47,7 @@ Set `include_tapo=False` on `TPLinkDeviceManager` to disable Tapo cloud support.
 | `device_manager.py` | Main entry point — `TPLinkDeviceManager` handles dual-cloud auth + unified device construction |
 | `device_info.py` | Device metadata including `cloud_type` ("kasa" or "tapo") |
 | `signing.py` | HMAC-SHA1 request signing for V2 API with configurable key pairs |
+| `redaction.py` | Replaces passwords, tokens, secrets and MFA codes in verbose output and error messages; new logging or error text goes through `redact` / `redact_body` |
 | `exceptions.py` | `TPLinkAuthError`, `TPLinkMFARequiredError`, `TPLinkTokenExpiredError`, `TPLinkCloudError`, `TPLinkDeviceOfflineError` |
 | `certs/` | TP-Link private CA cert chain (V2 API servers use their own CA) |
 

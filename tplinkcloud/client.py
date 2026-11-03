@@ -21,6 +21,7 @@ from .exceptions import (
     TPLinkMFARequiredError,
     TPLinkTokenExpiredError,
 )
+from .redaction import redact, redact_body
 from .signing import (
     KASA_ACCESS_KEY,
     KASA_SECRET_KEY,
@@ -139,28 +140,9 @@ class TPLinkApi:
 
         if self._verbose:
             print(f"POST {url}")
-            print(f"Body: {body_json}")
+            print(f"Body: {json.dumps(redact(body))}")
 
-        response = requests.post(
-            url,
-            data=body_json,
-            params=params,
-            headers=headers,
-            verify=self._ca_cert_path,
-            timeout=15,
-        )
-
-        if response.status_code == 200:
-            response_json = response.json()
-            if self._verbose:
-                print(json.dumps(response_json, indent=2))
-            return TPLinkApiResponse(response_json)
-
-        if response.content:
-            raise TPLinkCloudError(
-                f"{response.status_code}: {response.reason}: {response.content!r}"
-            )
-        raise TPLinkCloudError(f"{response.status_code}: {response.reason}")
+        return self._send(url, body_json, params, headers)
 
     def _request_post_v1(self, body, token=None):
         """Make a V1-style request (method/params wrapper) with V2 signing.
@@ -184,26 +166,38 @@ class TPLinkApi:
 
         if self._verbose:
             print(f"POST {self.host}/")
-            print(f"Body: {body_json}")
+            print(f"Body: {json.dumps(redact(body))}")
 
-        response = requests.post(
-            self.host,
-            data=body_json,
-            params=params,
-            headers=headers,
-            verify=self._ca_cert_path,
-            timeout=15,
-        )
+        return self._send(self.host, body_json, params, headers)
+
+    def _send(self, url, body_json, params, headers):
+        try:
+            response = requests.post(
+                url,
+                data=body_json,
+                params=params,
+                headers=headers,
+                verify=self._ca_cert_path,
+                timeout=15,
+            )
+        except requests.RequestException as error:
+            # requests quotes the whole URL in its messages, and the query
+            # carries the token. The type stays, so a caller's except still
+            # matches; the message and the chain do not survive.
+            raise type(error)(
+                f"Request to {url} failed: {type(error).__name__}"
+            ) from None
 
         if response.status_code == 200:
             response_json = response.json()
             if self._verbose:
-                print(json.dumps(response_json, indent=2))
+                print(json.dumps(redact(response_json), indent=2))
             return TPLinkApiResponse(response_json)
 
         if response.content:
             raise TPLinkCloudError(
-                f"{response.status_code}: {response.reason}: {response.content!r}"
+                f"{response.status_code}: {response.reason}: "
+                f"{redact_body(response.content)}"
             )
         raise TPLinkCloudError(f"{response.status_code}: {response.reason}")
 
