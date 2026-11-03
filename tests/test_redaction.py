@@ -1,9 +1,13 @@
 import json
 
+import aiohttp
 import pytest
 import requests
+from multidict import CIMultiDict, CIMultiDictProxy
+from yarl import URL
 
 from tplinkcloud.client import TPLinkApi
+from tplinkcloud.device_client import TPLinkDeviceClient
 from tplinkcloud.exceptions import TPLinkCloudError
 from tplinkcloud.redaction import REDACTED, redact, redact_body
 
@@ -113,11 +117,12 @@ class TestErrors:
             raise requests.ConnectionError(f"Max retries exceeded: {url}?token={params['token']}")
 
         monkeypatch.setattr(requests, "post", refuse)
-        with pytest.raises(TPLinkCloudError) as caught:
+        with pytest.raises(requests.ConnectionError) as caught:
             verbose_client._request_post_v1({"method": "getDeviceList"}, TOKEN)
         assert TOKEN not in str(caught.value)
         assert caught.value.__cause__ is None
         assert caught.value.__suppress_context__
+        assert caught.value.request is None
 
     def test_an_error_status_does_not_quote_a_credential(
         self, verbose_client, monkeypatch
@@ -128,3 +133,91 @@ class TestErrors:
             verbose_client._request_post_v1({"method": "getDeviceList"}, TOKEN)
         assert TOKEN not in str(caught.value)
         assert "500" in str(caught.value)
+
+
+class FakeDeviceResponse:
+
+    def __init__(self, status, reason, body):
+        self.status = status
+        self.reason = reason
+        self._body = body
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *exc):
+        return False
+
+    async def read(self):
+        return self._body
+
+
+def session_replying(response):
+    class Session:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        def post(self, *args, **kwargs):
+            return response
+
+    return Session
+
+
+def session_raising(error):
+    class Failing:
+        async def __aenter__(self):
+            raise error
+
+        async def __aexit__(self, *exc):
+            return False
+
+    return session_replying(Failing())
+
+
+@pytest.fixture
+def device_client():
+    return TPLinkDeviceClient("https://example.invalid", TOKEN)
+
+
+class TestDeviceClientErrors:
+
+    @pytest.mark.asyncio
+    async def test_a_redirect_failure_does_not_carry_the_token(
+        self, device_client, monkeypatch
+    ):
+        url = URL(f"https://example.invalid/?token={TOKEN}")
+        info = aiohttp.RequestInfo(
+            url, "POST", CIMultiDictProxy(CIMultiDict()), url
+        )
+        error = aiohttp.TooManyRedirects(info, ())
+        assert TOKEN in str(error)
+        monkeypatch.setattr(aiohttp, "ClientSession", session_raising(error))
+        with pytest.raises(TPLinkCloudError) as caught:
+            await device_client._request_post({"method": "passthrough"})
+        assert TOKEN not in str(caught.value)
+        assert caught.value.__suppress_context__
+
+    @pytest.mark.asyncio
+    async def test_a_connection_failure_keeps_its_type(
+        self, device_client, monkeypatch
+    ):
+        error = aiohttp.ServerDisconnectedError()
+        monkeypatch.setattr(aiohttp, "ClientSession", session_raising(error))
+        with pytest.raises(aiohttp.ServerDisconnectedError):
+            await device_client._request_post({"method": "passthrough"})
+
+    @pytest.mark.asyncio
+    async def test_an_error_status_does_not_quote_a_credential(
+        self, device_client, monkeypatch
+    ):
+        body = json.dumps({"token": TOKEN, "msg": "nope"}).encode()
+        reply = FakeDeviceResponse(500, "Server Error", body)
+        monkeypatch.setattr(aiohttp, "ClientSession", session_replying(reply))
+        with pytest.raises(TPLinkCloudError) as caught:
+            await device_client._request_post({"method": "passthrough"})
+        assert TOKEN not in str(caught.value)
+        assert "500" in str(caught.value)
+        assert "nope" in str(caught.value)

@@ -4,7 +4,8 @@ import uuid
 
 from .api_response import TPLinkApiResponse
 from .certs import get_ca_cert_path
-from .redaction import redact
+from .exceptions import TPLinkCloudError
+from .redaction import redact, redact_body
 from .signing import KASA_ACCESS_KEY, KASA_SECRET_KEY, get_signing_headers
 import ssl
 
@@ -57,24 +58,33 @@ class TPLinkDeviceClient:
         url = self.host if url_path == "/" else f"{self.host}{url_path}"
 
         async with aiohttp.ClientSession() as session:
-            async with session.post(
-                url,
-                data=body_json,
-                params=self._params,
-                headers=headers,
-                ssl=self._ssl_context,
-                timeout=aiohttp.ClientTimeout(total=600),
-            ) as response:
-                if response.status == 200:
-                    response_json = await response.json(content_type=None)
-                    if self._verbose:
-                        print(json.dumps(redact(response_json), indent=2))
-                    return TPLinkApiResponse(response_json)
-                elif response.content:
-                    raise Exception(str(response.status) + ': ' +
-                                    response.reason + ': ' + str(response.content))
-                else:
-                    raise Exception(str(response.status) + ': ' + response.reason)
+            try:
+                async with session.post(
+                    url,
+                    data=body_json,
+                    params=self._params,
+                    headers=headers,
+                    ssl=self._ssl_context,
+                    timeout=aiohttp.ClientTimeout(total=600),
+                ) as response:
+                    if response.status == 200:
+                        response_json = await response.json(content_type=None)
+                        if self._verbose:
+                            print(json.dumps(redact(response_json), indent=2))
+                        return TPLinkApiResponse(response_json)
+                    body = await response.read()
+                    if body:
+                        raise TPLinkCloudError(
+                            f"{response.status}: {response.reason}: "
+                            f"{redact_body(body)}"
+                        )
+                    raise TPLinkCloudError(f"{response.status}: {response.reason}")
+            except aiohttp.ClientResponseError as error:
+                # This family's messages quote the whole URL, and the query
+                # carries the token. aiohttp's connection errors name only the host.
+                raise TPLinkCloudError(
+                    f"Request to {url} failed: {type(error).__name__}"
+                ) from None
 
     async def pass_through_request(self, device_id, request_data):
         if self._cloud_type == "tapo":

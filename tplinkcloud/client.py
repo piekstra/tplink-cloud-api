@@ -182,8 +182,9 @@ class TPLinkApi:
             )
         except requests.RequestException as error:
             # requests quotes the whole URL in its messages, and the query
-            # carries the token, so neither the message nor the chain survives.
-            raise TPLinkCloudError(
+            # carries the token. The type stays, so a caller's except still
+            # matches; the message and the chain do not survive.
+            raise type(error)(
                 f"Request to {url} failed: {type(error).__name__}"
             ) from None
 
