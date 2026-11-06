@@ -25,12 +25,13 @@ class TestGetDevices(object):
     async def test_gets_devices(self, client):
         device_list = await client.get_devices()
         assert device_list is not None
-        # Kasa: 9 parents + 10 children = 19
+        # Kasa plugs/lights: 9 parents + 10 children = 19
         #   HS103, HS105, HS110, HS300 (6 children), KL430,
         #   HS200, KP200 (2 children), KP400 (2 children), KL420L5
+        # Kasa routers: 2 (Archer AX53, Archer VR400)
         # Tapo: 3 devices (P100, P110, L530)
-        # Total: 19 + 3 = 22
-        assert len(device_list) == 22
+        # Total: 19 + 2 + 3 = 24
+        assert len(device_list) == 24
 
 @pytest.mark.usefixtures('client')
 class TestFindDevice(object):
@@ -330,3 +331,29 @@ class TestAuth(object):
                 term_id=os.environ.get('TPLINK_KASA_TERM_ID')
             )
             device_manager.login(os.environ.get('TPLINK_KASA_USERNAME'), None)
+
+
+@pytest.mark.usefixtures('client')
+class TestRouterDispatch(object):
+
+    @pytest.mark.asyncio
+    async def test_finds_archer_ax53_router(self, client):
+        from tplinkcloud.router import Router
+        device_name = 'Archer AX53'
+        device = await client.find_device(device_name)
+        assert device is not None
+        assert isinstance(device, Router)
+        assert device.device_info.device_type == 'WIRELESSROUTER'
+        assert device.device_info.device_model == 'Archer AX53(EU)'
+        assert device.app_server_url_v2 == 'http://127.0.0.1:8080'
+        assert device.is_online() is True
+
+    @pytest.mark.asyncio
+    async def test_finds_archer_vr400_xdsl_router(self, client):
+        from tplinkcloud.router import Router
+        device_name = 'Archer VR400'
+        device = await client.find_device(device_name)
+        assert device is not None
+        assert isinstance(device, Router)
+        assert device.device_info.device_type == 'XDSLMODEMROUTER'
+        assert device.is_online() is False  # status 0 in fixture

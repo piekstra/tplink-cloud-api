@@ -17,4 +17,5 @@ class TPLinkDeviceInfo:
         self.fw_id = device_info.get('fwId')
         self.is_same_region = device_info.get('isSameRegion')
         self.status = device_info.get('status')
+        self.app_server_url_v2 = device_info.get('appServerUrlV2')
         self.cloud_type = cloud_type

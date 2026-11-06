@@ -19,6 +19,7 @@ class TPLinkDeviceType(Enum):
     KP400CHILD = 4002
     KL420L5 = 420
     KL430 = 430
-    UNKNOWN = 9999
     EP40 = 400
     EP40CHILD = 4000
+    ROUTER = 1000
+    UNKNOWN = 9999
